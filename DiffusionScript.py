@@ -5,6 +5,7 @@ from math import pi
 from math import exp
 from math import ceil
 from scipy.special import erf
+from scipy.special import erfinv
 import random
 from random import random as rand
 import datetime
@@ -66,7 +67,7 @@ def SimplePlot(fileName=''):
     plt.savefig("SimpleDiffusion "+str(datetime.date.today())+" "+str(i-1)+".pdf", bbox_inches='tight')
     # return plotValues
     
-def GaussDiffusion(T=297, mass=14.3, diffusionConstant=1E-10, runTime=1E-4, timeStep=1e-6):
+def GaussDiffusion(T=297, mass=14.3, diffusionConstant=1E-10, runTime=1, timeStep=1e-6):
     particlePos = [[0,0,0,0]] # x,y,z,t
     particleMass = mass/6.02E23
     boltzmann = 1.38E-23
@@ -80,15 +81,16 @@ def GaussDiffusion(T=297, mass=14.3, diffusionConstant=1E-10, runTime=1E-4, time
     n = ceil(runTime/timeStep)
     gaussStep = ceil((stepRate*timeStep)/2)*2
     gaussTime = gaussStep*stepTime
-    gaussValues = GaussianCDF(n=gaussStep)
+    #gaussValues = GaussianCDF(n=gaussStep)
+    mean = gaussStep/2
+    variance = gaussStep/4
+    stdDev = sqrt(variance)
     for x in range(n):
         particlePos.append([0,0,0,particlePos[x][3]+gaussTime])
         for y in range(3):
-            currentRandom=rand()
-            gaussFind = [abs(gaussValues[z]-currentRandom) for z in range(len(gaussValues))]
-            stepCount = np.argmin(gaussFind) - int(gaussStep/2)
-            particlePos[x+1][y] = particlePos[x][y] + (stepCount*stepLength)
-        print(x)
+            stepCount = (erfinv(2*rand()-1)*(stdDev*sqrt(2))+mean) - mean
+            particlePos[x+1][y] = particlePos[x][y] + stepCount*stepLength
+        #print(x)
     particlePos.insert(0, [currentSeed, T, mass, diffusionConstant, instantaeousVelocity, particleMass, stepLength, stepRate, stepTime])
     i = 0
     while os.path.exists("GaussDiffusion "+str(datetime.date.today())+" "+str(i)+".csv"):
