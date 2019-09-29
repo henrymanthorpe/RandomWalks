@@ -107,5 +107,9 @@ def GaussianDistribution(n=1000, p=0.5):
     values = [(1/sqrt(2*pi*variance))*exp(-((x-mean)**2)/(2*(variance))) for x in range(n+1)]
     return values
 
+def EmptyFunction():
+    return True
+
+
     
     
