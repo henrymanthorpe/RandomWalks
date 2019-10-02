@@ -14,6 +14,7 @@ from matplotlib import pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
 import os
 import csv
+import numba
 
 def SimpleDiffusion(T=297, mass=14.3, diffusionConstant=1E-10, n=10000): #Temperature (K), Molecularmass (kg), Diffusion Constant (m^2/s) number of steps
     particlePos = [[0,0,0,0]] # x,y,z,t
@@ -67,7 +68,7 @@ def SimplePlot(fileName=''):
     plt.savefig("SimpleDiffusion "+str(datetime.date.today())+" "+str(i-1)+".pdf", bbox_inches='tight')
     # return plotValues
     
-def GaussDiffusion(T=297, mass=14.3, diffusionConstant=1E-10, runTime=1, timeStep=1e-6):
+def GaussDiffusion(T=297, mass=14.3, diffusionConstant=1E-10, runTime=1, timeStep=1e-6, particleID = 0):
     particlePos = [[0,0,0,0]] # x,y,z,t
     particleMass = mass/6.02E23
     boltzmann = 1.38E-23
@@ -138,4 +139,87 @@ def GaussianCDF(n=1000, p=0.5):
     variance = (n*p*(1-p))
     values = [(1/2)*(1+erf((x-mean)/(sqrt(variance)*sqrt(2)))) for x in range (n+1)]
     return values
+
+def GaussDiffusionMulti(T=297, mass=14.3, diffusionConstant=1E-10, runTime=1, timeStep=1e-6, particleID = 0):
+    particlePos = [[0,0,0,0]] # x,y,z,t
+    particleMass = mass/6.02E23
+    boltzmann = 1.38E-23
+    kT = boltzmann*T
+    instantaeousVelocity = sqrt(kT/particleMass)
+    stepLength = 2*diffusionConstant/instantaeousVelocity
+    stepRate = instantaeousVelocity/stepLength
+    stepTime = 1/stepRate
+    currentSeed = datetime.datetime.now()
+    random.seed(a=currentSeed, version=2)
+    n = ceil(runTime/timeStep)
+    gaussStep = ceil((stepRate*timeStep)/2)*2
+    gaussTime = gaussStep*stepTime
+    #gaussValues = GaussianCDF(n=gaussStep)
+    mean = gaussStep/2
+    variance = gaussStep/4
+    stdDev = sqrt(variance)
+    for x in range(n):
+        particlePos.append([0,0,0,particlePos[x][3]+gaussTime])
+        for y in range(3):
+            stepCount = (erfinv(2*rand()-1)*(stdDev*sqrt(2))+mean) - mean
+            particlePos[x+1][y] = particlePos[x][y] + stepCount*stepLength
+        #print(x)
+    particlePos.insert(0, [particleID, currentSeed, T, mass, diffusionConstant, instantaeousVelocity, particleMass, stepLength, stepRate, stepTime])
+    return particlePos
+
+def MultiParticleDiffusion(T=297, mass=14.3, diffusionConstant=1E-10, runTime=1, timeStep=1e-6, particleTotal=1):
+    results = []
+    for x in range(particleTotal):
+        results.append(GaussDiffusionMulti(T=297, mass=14.3, diffusionConstant=1E-10, runTime=1, timeStep=1e-6, particleID = x))
+    i=0
+    while os.path.exists("MultiGaussDiffusion "+str(datetime.date.today())+" "+str(i)+".csv"):
+        i = i+1
+    
+    fileName = "MultiGaussDiffusion "+str(datetime.date.today())+" "+str(i)+".csv"
+    print('debug')
+    f = open(fileName, 'w+', newline='')
+    print('foo')
+    linewriter = csv.writer(f, delimiter=',', quotechar='"', quoting=csv.QUOTE_MINIMAL)
+    print('bar')
+    for x in range(len(results)):
+        linewriter.writerow(results[x])
+        print(x)
+    f.close()
+    return results
+
+
+@numba.njit
+def GaussDiffusionParallel(T=297, mass=14.3, diffusionConstant=1E-10, runTime=1, timeStep=1e-6, particleID = 0):
+    particlePos = [[0,0,0,0]] # x,y,z,t
+    particleMass = mass/6.02E23
+    boltzmann = 1.38E-23
+    kT = boltzmann*T
+    instantaeousVelocity = sqrt(kT/particleMass)
+    stepLength = 2*diffusionConstant/instantaeousVelocity
+    stepRate = instantaeousVelocity/stepLength
+    stepTime = 1/stepRate
+    currentSeed = datetime.datetime.now()
+    random.seed(a=currentSeed, version=2)
+    n = ceil(runTime/timeStep)
+    gaussStep = ceil((stepRate*timeStep)/2)*2
+    gaussTime = gaussStep*stepTime
+    #gaussValues = GaussianCDF(n=gaussStep)
+    mean = gaussStep/2
+    variance = gaussStep/4
+    stdDev = sqrt(variance)
+    for x in range(n):
+        particlePos.append([0,0,0,particlePos[x][3]+gaussTime])
+        for y in range(3):
+            stepCount = (erfinv(2*rand()-1)*(stdDev*sqrt(2))+mean) - mean
+            particlePos[x+1][y] = particlePos[x][y] + stepCount*stepLength
+        #print(x)
+    particlePos.insert(0, [particleID, currentSeed, T, mass, diffusionConstant, instantaeousVelocity, particleMass, stepLength, stepRate, stepTime])
+    return particlePos
+
+@numba.njit(parallel=True)    
+def MultiParticleDiffusionParallel(T=297, mass=14.3, diffusionConstant=1E-10, runTime=1, timeStep=1e-6, particleTotal=10):
+    results = []
+    for x in numba.prange(particleTotal):
+        results.append(GaussDiffusionParallel(T=297, mass=14.3, diffusionConstant=1E-10, runTime=1, timeStep=1e-6, particleID = x))
+    return results
     
