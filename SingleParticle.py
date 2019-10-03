@@ -57,7 +57,6 @@ def GaussDiffusionStep(particlePos, gaussMean, gaussDev, gaussTime, stepLength):
     return particlePos
 
 def GaussDiffusion(T=297, mass=14.3, diffusionConstant=1E-10, runTime=1, timeStep=1e-6):
-    particlePos = [[0,0,0,0]] # x,y,z,t
     particleMass = mass/6.02E23
     boltzmann = 1.38E-23
     kT = boltzmann*T
@@ -73,8 +72,10 @@ def GaussDiffusion(T=297, mass=14.3, diffusionConstant=1E-10, runTime=1, timeSte
     gaussMean = gaussStep/2
     gaussVar = gaussStep/4
     gaussDev = sqrt(gaussVar)
+    particlePos = [[0,0,0,0] for x in range(n+1)]
     for x in range(n):
-        particlePos.append(GaussDiffusionStep(particlePos[x], gaussMean, gaussDev, gaussTime, stepLength))
+        particlePosCurrent = GaussDiffusionStep(particlePos[x], gaussMean, gaussDev, gaussTime, stepLength)
+        particlePos[x+1] = [particlePosCurrent[y] for y in range(4)]
     particlePos.insert(0, [currentSeed, T, mass, diffusionConstant, instantaeousVelocity, particleMass, stepLength, stepRate, stepTime])
     return particlePos
 

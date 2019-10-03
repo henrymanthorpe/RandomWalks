@@ -1,5 +1,7 @@
 #ignore .spyproject
 .spyproject/
+__pycache__/
 
 *.pdf
 *.csv
+*.out
