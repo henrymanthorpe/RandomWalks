@@ -68,7 +68,7 @@ def SimplePlot(fileName=''):
     plt.savefig("SimpleDiffusion "+str(datetime.date.today())+" "+str(i-1)+".pdf", bbox_inches='tight')
     # return plotValues
     
-def GaussDiffusion(T=297, mass=14.3, diffusionConstant=1E-10, runTime=1, timeStep=1e-6, particleID = 0):
+def GaussDiffusion(T=297, mass=14.3, diffusionConstant=1E-10, runTime=1, timeStep=1e-6):
     particlePos = [[0,0,0,0]] # x,y,z,t
     particleMass = mass/6.02E23
     boltzmann = 1.38E-23
