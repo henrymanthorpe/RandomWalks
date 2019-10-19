@@ -8,7 +8,7 @@ import numpy as np
 from math import sqrt, ceil
 import datetime
 import os
-
+# &&
 def buildBinomial(n,t):
     return np.random.binomial(t, 0.5, (n,3))
 # Builds array of (n,3) random binomial outcomes based on B(t, 0.5). 
@@ -55,7 +55,7 @@ def runDiffusion(dv, tv):
     return linearDiffusion(tv[0],tv[1],dv[2],tv[2])
 # Runs linear diffusiion based of prebuilt diffusion and time variables
 
-def linearDiffusionExport(k):
+def linearDiffusionExportOld(k):
     total = list(k)
     n=len(total)
     total.insert(0,np.zeros(4))
@@ -63,6 +63,9 @@ def linearDiffusionExport(k):
         total[x+1]=total[x+1]+total[x]
     return np.asarray(total)
 # Sums contents of array based on previous values and outputs complete diffusion path.
+
+def linearDiffusionExport(k):
+    return np.cumsum(k, axis=0)
 
 def guidedDiffusion():
     print("Welcome to the guided Linear Particle Diffusion position 4vector generator!")
@@ -122,8 +125,8 @@ def guidedDiffusion():
     return linearDiffusionExport(k)
 # Provides guided method for building a diffusion output
 
-def linearDiffusionSave(results):
-    if results == False:
+def linearDiffusionSave(results=np.zeros(1)):
+    if results.any() == False:
         results=guidedDiffusion()
     i = 0
     while os.path.exists("LinearDiffusion "+str(datetime.date.today())+" "+str(i)+".out"):
@@ -179,7 +182,10 @@ def chunkedDiffusionRender(k, tStart, tEnd):
         results = np.vstack((results, p))
     return results
 
-        
+def headingGen(n): # Generates random starting heading for n particles
+    k = np.random.rand(n, 2)
+    
+    
         
         
         
