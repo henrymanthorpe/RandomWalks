@@ -9,8 +9,8 @@ from math import sqrt, ceil
 import datetime
 import os
 # &&
-def buildBinomial(n,t):
-    return np.random.binomial(t, 0.5, (n,3))
+def buildBinomial(n,t,i):
+    return np.random.binomial(t, 0.5, (n,i))
 # Builds array of (n,3) random binomial outcomes based on B(t, 0.5). 
 # Represents total steps taken in positive direction.
 
@@ -21,6 +21,17 @@ def subtractMean(k,t):
 def stepToDistance(k,l):
     return k*l
 # Converts step count to displacement
+    
+def externalForce(k,m,s, force=(0,0,0)):
+    f = np.asarray(force, dtype=float)
+    if np.count_nonzero(f) == 0:
+        return k
+    else:
+        f = f/m
+        f = 0.5*f
+        t = s**2
+        f = f*t
+        return k+f
 
 def addTime(k,s):
     time = np.full((len(k),1), s)
@@ -28,10 +39,11 @@ def addTime(k,s):
 # adds time step to array
 
 def linearDiffusion(n, t, l, s):
-    k = buildBinomial(n,t)
+    k = buildBinomial(n,t,3)
     k = subtractMean(k,t)
     k = stepToDistance(k,l)
-    k = addTime(k,s)
+   # k = externalForce(k)
+    k = addTime(k, s)
     return k
 # Completes all four of the above steps sequentially. Returns completed array
 
@@ -182,8 +194,20 @@ def chunkedDiffusionRender(k, tStart, tEnd):
         results = np.vstack((results, p))
     return results
 
+
 def headingGen(n): # Generates random starting heading for n particles
     k = np.random.rand(n, 2)
+    return k*360
+
+def rotationalDiffusion(n,t,a,s):
+    k = buildBinomial(n,t,2)
+    k = subtractMean(k,t)
+    k = stepToDistance(k,a)
+    k = addTime(k,s)
+    return k
+
+
+
     
     
         
