@@ -15,10 +15,11 @@ from scipy import constants
 
 pi = np.pi
 boltz = constants.Boltzmann
-avo = constants.Avogadro#
+avo = constants.Avogadro
 g = constants.g
 
 def Diffusion(molecular_mass, temperature, absolute_viscosity, radius, particles, external_force, gravity, run_time, intermediate_time, base_time):
+    
     if type(radius) == float :
         frictional_drag_linear = 6*pi*absolute_viscosity*radius
         frictional_drag_rotational = 8*pi*absolute_viscosity*(radius**3)
@@ -77,16 +78,30 @@ def Diffusion(molecular_mass, temperature, absolute_viscosity, radius, particles
             particle_results[y] = np.sum(diffusion, axis=0)
 
         results[x] = np.hstack((particle_results,seed))
+    render_variables = np.asarray((sample_steps,intermediate_sample,step_linear,step_rotational,sample_time))
+    input_variables = np.asarray((molecular_mass, temperature, absolute_viscosity, radius, particles, external_force, gravity, run_time, intermediate_time, base_time))
+    
+    i = 0
+    while os.path.exists("LinearDiffusion "+str(datetime.date.today())+" "+str(i)+".npz"):
+        i = i+1
+    
+    fileName = "LinearDiffusion "+str(datetime.date.today())+" "+str(i)+".npz"
+    np.savez(fileName, results=results, render_variables=render_variables, input_variables=input_variables)
 
-    return results,(sample_steps,intermediate_sample,step_linear,step_rotational,sample_time)
+    return results, render_variables, input_variables
 
-def DiffusionRender(input_tuple, particles="", time_span):
-    input_array = input_tuple(0)
-    if particles == "":
-        render_array = input_array
-        particle_number = len(results)
-    if type(particles)==int:
-        render_array = 
-    results,seed = np.dsplit(input_array,[6])
-    time_start = time_span[0]
-    time_end = time_span[1]
+#def DiffusionRender(input_value="", time_span="", particles=""):
+#    input_array = input_tuple(0)
+#    if particles == "":
+#        render_array = input_array
+#        particle_number = len(results)
+#    elif type(particles)==int:
+#        render_array = np.zeros()
+#        particle_number=1
+#    elif type(particles)==list:
+#        render_array = np.vsplit([particles[0]]
+#        for x in range(1, len(particles)):
+#            render_array = np.vstack(render_array,input_array)
+#    results,seed = np.dsplit(input_array,[6])
+#    time_start = time_span[0]
+#    time_end = time_span[1]
