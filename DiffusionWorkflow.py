@@ -18,6 +18,10 @@ boltz = constants.Boltzmann
 avo = constants.Avogadro
 g = constants.g
 
+
+        
+        
+
 def Diffusion(molecular_mass, temperature, absolute_viscosity, radius, particles, external_force, gravity, run_time, intermediate_time, base_time):
     
     if type(radius) == float :
