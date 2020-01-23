@@ -27,6 +27,10 @@ class RunVars:
         self.radius=0
         self.run_time=0
         self.base_time=0
+        self.run_speed=0
+        self.run_duration=0
+        self.tumble_angle_deg=0
+        self.tumble_duration=0
         
 
     def Build(self):
@@ -66,7 +70,11 @@ class RunVars:
         self.step_rate_rotational = [self.rms_velocity/self.step_rotational[x] for x in range(3)]
         self.step_time_rotational = [1.0/self.step_rate_rotational[x] for x in range(3)]
         self.sample_steps_rotational = [self.step_rate_rotational[x]*self.base_time for x in range(3)]
-        
+        # Build for basic fixed run&tumble
+        self.run_length = np.round((self.run_duration/self.base_time))
+        self.tumble_length = np.round((self.tumble_duration/self.base_time))
+        self.run_step = self.run_speed*self.base_time
+        self.tumble_angle_rad = np.deg2rad(self.tumble_angle_deg)
      
     def Input(self):
         print("Welcome to the guided Variable builder \n")
@@ -174,7 +182,43 @@ class RunVars:
                     print("Error: Negative value not possible")
             except ValueError:
                 print("Error: That is not a numerical input")
-        
+        print("\n--Run&Tumble Variables--")
+        while True:
+            try:
+                self.run_speed = float(input("Input average run speed (m/s) : "))
+                if self.run_speed > 0:
+                    break
+                else:
+                    print("Error: Negative value not possible")
+            except ValueError:
+                print("Error: That is not a numerical input")
+        while True:
+            try:
+                self.run_duration = float(input("Input average run duration (s) : "))
+                if self.run_duration > 0:
+                    break
+                else:
+                    print("Error: Negative value not possible")
+            except ValueError:
+                print("Error: That is not a numerical input")
+        while True:
+            try:
+                self.tumble_angle_deg = float(input("Input average tumble angle (degrees) : "))
+                if self.tumble_angle_deg >= 0 and self.tumble_angle_deg <= 360:
+                    break
+                else:
+                    print("Error: Please input value between 0 and 360 inclusive")
+            except ValueError:
+                print("Error: That is not a numerical input")
+        while True:
+            try:
+                self.tumble_duration = float(input("Input average tumble duration (s) : "))
+                if self.tumble_duration > 0:
+                    break
+                else:
+                    print("Error: Negative value not possible")
+            except ValueError:
+                print("Error: That is not a numerical input")
         self.Build()
     
     def Save(self, f_name = ''):
@@ -187,7 +231,7 @@ class RunVars:
         elif type(f_name) != str:
             print("Error: File name must be a string")
             return 1
-        out_list = [self.base_time,self.run_time,self.absolute_viscosity,self.temperature,self.external_forces,self.molecular_mass, self.radius]
+        out_list = [self.base_time,self.run_time,self.absolute_viscosity,self.temperature,self.external_forces,self.molecular_mass, self.radius, self.run_speed, self.run_duration, self.tumble_angle_deg, self.tumble_duration]
         out_array = np.array(out_list)
         np.save(f_name, out_array)
         return 0
@@ -201,6 +245,10 @@ class RunVars:
         self.external_forces=in_array[4]
         self.molecular_mass=in_array[5]
         self.radius=in_array[6]
+        self.run_speed=in_array[7]
+        self.run_duration=in_array[8]
+        self.tumble_angle_deg=in_array[9]
+        self.tumble_duration=in_array[10]
         self.Build()
 
         
