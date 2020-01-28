@@ -18,7 +18,7 @@ g = constants.g
 
 class RunVars:
     # Holds User-defined Variables for Particle Simulations
-    
+
     def __init__(self):
         self.absolute_viscosity=0
         self.temperature=0
@@ -31,10 +31,10 @@ class RunVars:
         self.run_duration=0
         self.tumble_angle_deg=0
         self.tumble_duration=0
-        
+
 
     def Build(self):
-        
+
         self.diffusion_constant_rotational = np.zeros(3)
         if type(self.radius) == float :
             self.frictional_drag_linear = 6*pi*self.absolute_viscosity*self.radius
@@ -53,7 +53,7 @@ class RunVars:
         else:
             print("Error: Invalid Datatype for radius")
             return 0
-        
+
         self.diffusion_constant_linear = self.temperature*boltz/self.frictional_drag_linear
         self.particle_mass = self.molecular_mass/avo
         self.rms_velocity = sqrt(boltz*self.temperature/self.particle_mass)
@@ -75,7 +75,7 @@ class RunVars:
         self.tumble_length = np.round((self.tumble_duration/self.base_time))
         self.run_step = self.run_speed*self.base_time
         self.tumble_angle_rad = np.deg2rad(self.tumble_angle_deg)
-     
+
     def Input(self):
         print("Welcome to the guided Variable builder \n")
         print("--- Particle Variables ---")
@@ -88,9 +88,9 @@ class RunVars:
                     print("Error: Negative Mass not possible")
             except ValueError:
                 print("Error: That is not a numerical input")
-        
-        
-        
+
+
+
         while True:
             try:
                 self.particle_shape = input("Select particle shape - (S)phere or (E)llipsoid : ")
@@ -115,7 +115,7 @@ class RunVars:
                         except ValueError:
                             print("Error: That is not a numerical input")
                     break
-                
+
                 elif self.particle_shape == 'S' or self.particle_shape.lower()=='sphere':
                     while True:
                         try:
@@ -127,12 +127,12 @@ class RunVars:
                         except ValueError:
                             print("Error: That is not a numerical input")
                     break
-                    
+
                 else:
                     print("Error:Not a valid input")
             except SyntaxError:
                 print("Error: That is not an allowed input")
-            
+
         print("\n--System Variables--")
         while True:
             try:
@@ -152,7 +152,7 @@ class RunVars:
                     print("Error: Negative value not possible")
             except ValueError:
                 print("Error: That is not a numerical input")
-        
+
         while True:
             try:
                 self.force_input = input("Input external forces (x,y,z) (N) : ")
@@ -220,13 +220,13 @@ class RunVars:
             except ValueError:
                 print("Error: That is not a numerical input")
         self.Build()
-    
+
     def Save(self, f_name = ''):
         if f_name == '':
             i = 0
             while os.path.exists("RunVariables "+str(datetime.date.today())+" "+str(i)+".npy"):
                 i = i+1
-        
+
             f_name = "RunVariables "+str(datetime.date.today())+" "+str(i)
         elif type(f_name) != str:
             print("Error: File name must be a string")
@@ -235,7 +235,7 @@ class RunVars:
         out_array = np.array(out_list)
         np.save(f_name, out_array)
         return 0
-    
+
     def Load(self, f_name):
         in_array = np.load(f_name, allow_pickle=True)
         self.base_time=in_array[0]
@@ -250,5 +250,3 @@ class RunVars:
         self.tumble_angle_deg=in_array[9]
         self.tumble_duration=in_array[10]
         self.Build()
-
-        

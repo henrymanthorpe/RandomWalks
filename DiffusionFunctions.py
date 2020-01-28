@@ -88,11 +88,16 @@ class SingleParticle:
         self.linear_output = self.linear_sample + self.run_disp
         self.linear_output = np.cumsum(self.linear_output, axis=0)
     
-    def Graph(self):
+    def Graph_Linear_Full(self):
         self.graph_input = np.swapaxes(self.linear_output, 0,1)
         gp.s(self.graph_input)
         gp.c('splot "tmp.dat" with lines')
-        
+    
+    def Graph_Rotational(self):
+        self.graph_input = np.swapaxes(self.vectors_cartesian,0,1)
+        gp.s(self.graph_input)
+        gp.c('splot "tmp.dat" u 1:2:3')
+    
         
 
 def SingleParticleAnalysis(z,d, graph=True):
