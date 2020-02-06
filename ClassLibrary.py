@@ -35,30 +35,30 @@ class RunVars:
 
     def Build(self):
 
-        self.diffusion_constant_rotational = np.zeros(3)
+        self.diffusion_constant_rotational = 0
         if type(self.radius) == float :
             self.frictional_drag_linear = 6*pi*self.absolute_viscosity*self.radius
             self.frictional_drag_rotational = 8*pi*self.absolute_viscosity*(self.radius**3)
-            self.diffusion_constant_rotational[0] = self.temperature*boltz/self.frictional_drag_rotational
-            self.diffusion_constant_rotational[1] = self.temperature*boltz/self.frictional_drag_rotational
-            self.diffusion_constant_rotational[2] = self.temperature*boltz/self.frictional_drag_rotational
-        elif type(self.radius) == list :
-            q = np.log(2*self.radius[0]/self.radius[1])
-            self.frictional_drag_linear = 6*pi*self.absolute_viscosity*self.radius[0]/q
-            self.frictional_drag_rotational_minor = (8*pi*self.absolute_viscosity*(self.radius[0]**3)/3)/(q+0.5)
-            self.frictional_drag_rotational_major = (16/3)*pi*self.absolute_viscosity*self.radius[0]*self.radius[1]**2
-            self.diffusion_constant_rotational[0] = self.temperature*boltz/self.frictional_drag_rotational_major
-            self.diffusion_constant_rotational[1] = self.temperature*boltz/self.frictional_drag_rotational_minor
-            self.diffusion_constant_rotational[2] = self.temperature*boltz/self.frictional_drag_rotational_minor
+            self.diffusion_constant_rotational = self.temperature*boltz/self.frictional_drag_rotational
+        
+
+        # elif type(self.radius) == list :
+        #     q = np.log(2*self.radius[0]/self.radius[1])
+        #     self.frictional_drag_linear = 6*pi*self.absolute_viscosity*self.radius[0]/q
+        #     self.frictional_drag_rotational_minor = (8*pi*self.absolute_viscosity*(self.radius[0]**3)/3)/(q+0.5)
+        #     self.diffusion_constant_rotational = self.temperature*boltz/self.frictional_drag_rotational_minor
+            
         else:
             print("Error: Invalid Datatype for radius")
-            return 0
-
+            return 1
+        
         self.diffusion_constant_linear = self.temperature*boltz/self.frictional_drag_linear
         self.particle_mass = self.molecular_mass/avo
-        self.rms_velocity = sqrt(boltz*self.temperature/self.particle_mass)
-        self.step_linear = 2*self.diffusion_constant_linear/self.rms_velocity
-        self.step_rate_linear = self.rms_velocity/self.step_linear
+        self.MoI = 0.4*self.particle_mass*self.radius**2
+        self.rms_velocity_linear = sqrt(boltz*self.temperature/self.particle_mass)
+        self.rms_velocity_rotational = sqrt(boltz*self.temperature/self.MoI)
+        self.step_linear = 2*self.diffusion_constant_linear/self.rms_velocity_linear
+        self.step_rate_linear = self.rms_velocity_linear/self.step_linear
         self.step_time_linear = 1.0/self.step_rate_linear
         self.external_forces = self.external_forces.reshape(3,1)
         self.external_acceleration = self.external_forces/self.particle_mass
@@ -66,10 +66,10 @@ class RunVars:
         self.sample_total = ceil(self.run_time/self.base_time)
         self.run_time = self.base_time*self.sample_total #Increases run_time to include integer number of samples
         self.sample_steps_linear = self.step_rate_linear*self.base_time
-        self.step_rotational = [2*self.diffusion_constant_rotational[x]/self.rms_velocity for x in range(3)]
-        self.step_rate_rotational = [self.rms_velocity/self.step_rotational[x] for x in range(3)]
-        self.step_time_rotational = [1.0/self.step_rate_rotational[x] for x in range(3)]
-        self.sample_steps_rotational = [self.step_rate_rotational[x]*self.base_time for x in range(3)]
+        self.step_rotational = 2*self.diffusion_constant_rotational/self.rms_velocity_rotational
+        self.step_rate_rotational = self.rms_velocity_rotational/self.step_rotational
+        self.step_time_rotational = 1.0/self.step_rate_rotational
+        self.sample_steps_rotational = self.step_rate_rotational*self.base_time
         # Build for basic fixed run&tumble
         self.run_length = np.round((self.run_duration/self.base_time))
         self.tumble_length = np.round((self.tumble_duration/self.base_time))
@@ -93,7 +93,7 @@ class RunVars:
 
         while True:
             try:
-                self.particle_shape = input("Select particle shape - (S)phere or (E)llipsoid : ")
+                self.particle_shape = input("Select particle shape - (S)phere or (E)llipsoid (ELLIPSOIDS CURRENTLY DON'T WORK) : ")
                 if self.particle_shape == 'E' or self.particle_shape.lower()=='ellipsoid':
                     self.radius = list([0,0])
                     while True:

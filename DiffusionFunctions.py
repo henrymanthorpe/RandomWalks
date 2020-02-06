@@ -35,19 +35,19 @@ class SingleParticle:
         
         
     def Rotational(self, d):
-        self.mean_rotational = np.zeros(3)
-        self.std_dev_rotational = np.zeros(3)
-        self.rotational_axes = np.zeros((3,d.sample_total))
-        for x in range(3):
-            self.mean_rotational[x] = d.sample_steps_rotational[x]*0.5
-            self.std_dev_rotational[x] = d.sample_steps_rotational[x]*0.5*0.5
-            self.rotational_axes[x] = np.random.normal(self.mean_rotational[x], self.std_dev_rotational[x], (1,d.sample_total))
-            self.rotational_axes[x] -= self.mean_rotational[x]
-            self.rotational_axes[x] = self.rotational_axes[x]*d.step_rotational[x]*2
-        self.euler_sample = [R.from_euler('xyz',(self.rotational_axes[0][x],self.rotational_axes[1][x],self.rotational_axes[2][x])) for x in range(d.sample_total)]
-        self.rot_curr = R.from_euler('xyz',(0,0,0))
+        self.mean_rotational = 0
+        self.std_dev_rotational = 0
+        self.rotational_axes = np.zeros((2,d.sample_total))
+        for x in range(2):
+            self.mean_rotational = d.sample_steps_rotational*0.5
+            self.std_dev_rotational = d.sample_steps_rotational*0.5*0.5
+            self.rotational_axes[x] = np.random.normal(self.mean_rotational, self.std_dev_rotational, (1,d.sample_total))
+            self.rotational_axes[x] -= self.mean_rotational
+            self.rotational_axes[x] = self.rotational_axes[x]*d.step_rotational*2
+        self.euler_sample = [R.from_euler('yz',(self.rotational_axes[0][x],self.rotational_axes[1][x])) for x in range(d.sample_total)]
+        self.rot_curr = R.from_euler('yz',(0,0))
         self.rotational_sample = [0 for x in range(d.sample_total+1)]
-        self.rotational_sample[0] = R.from_euler('xyz', (0,0,0))
+        self.rotational_sample[0] = R.from_euler('yz', (0,0))
         self.vector_initial = np.array((1,0,0))
         self.vectors_cartesian = np.zeros((d.sample_total,3))
         for x in range(d.sample_total):
@@ -101,40 +101,56 @@ class SingleParticle:
         
 
 def SingleParticleAnalysis(z,d, graph=True):
-    linear = np.cumsum(z.linear_sample, axis=1)
+    linear = np.cumsum(z.linear_sample, axis=0)
     tau = d.base_time
     sample_total = floor(log10(d.run_time/d.base_time))
-    results = [np.zeros(sample_total) for x in range(4)]
-    run_total = len(z.time)
+    results = [np.zeros(sample_total) for x in range(3)]
+    run_total = d.sample_total
     for i in range(sample_total):
-        results[3][i] = tau
+        results[2][i] = tau
         sample_size = floor(d.run_time/tau)
         tau_i = floor(run_total/sample_size)
         for y in range(3):
-            results_stack = np.zeros(sample_size)
+            results_stack = np.zeros(sample_size-1)
             for x in range(sample_size-1):
-                results_stack[x] = linear[y][(x+1)*tau_i]-linear[y][x*tau_i]
+                results_stack[x] = linear[(x+1)*tau_i][y]-linear[x*tau_i][y]
             results_stack_2 = results_stack**2
-            results[y][i] = np.mean(results_stack_2)
+            results[0][i] = results[0][i] + np.mean(results_stack_2)
         tau = tau*10
-        
-    if graph==False:
-        return results
-    else:
-        labels = ['x','y','z']
-        expected_msd = results[3]*2*d.diffusion_constant_linear
-        for x in range(3):
-            plt.title("Expected vs Actual MSD - {label}".format(label=labels[x]))
-            plt.xlabel("Tau (s)")
-            plt.ylabel("{label}^2 (m^2)".format(label=labels[x]))
-            plt.xscale("log")
-            plt.yscale("log")
-            plt.plot(results[3], results[x], 'r-', results[3], expected_msd, 'b-')
-            plt.show()
-            
-        return results
-            
-        
+    results[1] = results[2]*6*d.diffusion_constant_linear
+    gp.s(results)
+    gp.c('set logscale xy 10')
+    gp.c('set xlabel "Tau (s)"')
+    gp.c('set ylabel "MSD (m^2)"')
+    gp.c('set title "Analysis of Linear Diffusion Mean Squared Displacement"')
+    gp.c('plot "tmp.dat" u 3:1 w lines title "Actual MSD", "tmp.dat" u 3:2 w lines title "Expected MSD"')
+
+
+def RotationalAnalysis(z,d, graph=True):
+    rotational_vect = z.vectors_cartesian
+    tau = d.base_time
+    sample_total = floor(log10(d.run_time/d.base_time))
+    results = [np.zeros(sample_total) for x in range(3)]
+    run_total = d.sample_total
+    for i in range(sample_total):
+        results[2][i] = tau
+        sample_size = floor(d.run_time/tau)
+        tau_i = floor(run_total/sample_size)
+        results_stack = np.zeros(sample_size-1)
+        for x in range(sample_size-1):
+            results_stack[x] = np.dot(rotational_vect[(x+1)*tau_i],rotational_vect[x*tau_i])
+            results_stack[x] = np.arccos(results_stack[x])
+        results_stack_2 = results_stack**2
+        results[0][i] = np.mean(results_stack_2)
+        tau = tau*10
+    results[1] = results[2]*4*d.diffusion_constant_rotational
+    gp.s(results)
+    gp.c('set logscale xy 10')
+    gp.c('set xlabel "Tau (s)"')
+    gp.c('set ylabel "MSD (theta^2)"')
+    gp.c('set title "Analysis of Rotational Diffusion Mean Squared Displacement"')
+    gp.c('plot "tmp.dat" u 3:1 w lines title "Actual MSD", "tmp.dat" u 3:2 w lines title "Expected MSD"')
+    
     
     
 def SingleParticleFull():
