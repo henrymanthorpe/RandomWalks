@@ -1,7 +1,7 @@
 #ignore .spyproject
 .spyproject/
 __pycache__/
-
+pygnuplot/
 *.pdf
 *.csv
 *.out

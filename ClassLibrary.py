@@ -237,6 +237,7 @@ class RunVars:
         return 0
 
     def Load(self, f_name):
+        f_name = f_name + ".npy"
         in_array = np.load(f_name, allow_pickle=True)
         self.base_time=in_array[0]
         self.run_time=in_array[1]

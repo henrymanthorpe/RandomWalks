@@ -100,7 +100,7 @@ class SingleParticle:
     
         
 
-def SingleParticleAnalysis(z,d, graph=True):
+def SingleParticleAnalysis(z,d):
     linear = np.cumsum(z.linear_sample, axis=0)
     tau = d.base_time
     sample_total = floor(log10(d.run_time/d.base_time))
@@ -120,7 +120,7 @@ def SingleParticleAnalysis(z,d, graph=True):
     results[1] = results[2]*6*d.diffusion_constant_linear
     gp.s(results)
     gp.c('set logscale xy 10')
-    gp.c('set xlabel "Tau (s)"')
+    gp.c('set xlabel "{/Symbol t} (s)"')
     gp.c('set ylabel "MSD (m^2)"')
     gp.c('set title "Analysis of Linear Diffusion Mean Squared Displacement"')
     gp.c('plot "tmp.dat" u 3:1 w lines title "Actual MSD", "tmp.dat" u 3:2 w lines title "Expected MSD"')
@@ -146,8 +146,8 @@ def RotationalAnalysis(z,d, graph=True):
     results[1] = results[2]*4*d.diffusion_constant_rotational
     gp.s(results)
     gp.c('set logscale xy 10')
-    gp.c('set xlabel "Tau (s)"')
-    gp.c('set ylabel "MSD (theta^2)"')
+    gp.c('set xlabel "{/Symbol t} (s)"')
+    gp.c('set ylabel "MSD ({/Symbol q}^2)"')
     gp.c('set title "Analysis of Rotational Diffusion Mean Squared Displacement"')
     gp.c('plot "tmp.dat" u 3:1 w lines title "Actual MSD", "tmp.dat" u 3:2 w lines title "Expected MSD"')
     
