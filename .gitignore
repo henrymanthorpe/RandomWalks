@@ -8,3 +8,5 @@ pygnuplot/
 *.npz
 *.npy
 *.dat
+*.log
+

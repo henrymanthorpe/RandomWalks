@@ -177,13 +177,13 @@ def LinearDiffusionAnalysis(z,d):
     gp.c('set xlabel "{/Symbol t} (s)"')
     gp.c('set ylabel "MSD (m^2)"')
     gp.c('set title "Analysis of Linear Diffusion Mean Squared Displacement"')
-    gp.c('plot "tmp.dat" u 3:1 w lines title "Actual MSD", "tmp.dat" u 3:2 w lines title "Expected MSD"')
+    gp.c('plot "tmp.dat" u 3:1 w points title "Actual MSD", "tmp.dat" u 3:2 w lines title "Expected MSD"')
 
 
 def RotationalAnalysis(z,d, graph=True):
     rotational_vect = z.vectors_cartesian
     tau = d.base_time
-    sample_total = floor(log10(d.run_time/d.base_time))
+    sample_total = floor(np.log2(d.run_time/d.base_time))
     results = [np.zeros(sample_total) for x in range(3)]
     run_total = d.sample_total
     for i in range(sample_total):
@@ -196,7 +196,7 @@ def RotationalAnalysis(z,d, graph=True):
             results_stack[x] = np.arccos(results_stack[x])
         results_stack_2 = results_stack**2
         results[0][i] = np.mean(results_stack_2)
-        tau = tau*10
+        tau = tau*2
     results[1] = results[2]*4*d.diffusion_constant_rotational
     gp.s(results)
     gp.c('reset')
@@ -204,7 +204,7 @@ def RotationalAnalysis(z,d, graph=True):
     gp.c('set xlabel "{/Symbol t} (s)"')
     gp.c('set ylabel "MSD ({/Symbol q}^2)"')
     gp.c('set title "Analysis of Rotational Diffusion Mean Squared Displacement"')
-    gp.c('plot "tmp.dat" u 3:1 w lines title "Actual MSD", "tmp.dat" u 3:2 w lines title "Expected MSD"')
+    gp.c('plot "tmp.dat" u 3:1 w points title "Actual MSD", "tmp.dat" u 3:2 w lines title "Expected MSD"')
     
     
     
