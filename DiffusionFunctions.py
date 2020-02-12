@@ -6,19 +6,69 @@ Created on Thu Nov  7 22:00:16 2019
 """
 
 import numpy as np
+import quaternion
 from scipy import constants
 from scipy.spatial.transform import Rotation as R
-from math import sqrt, ceil, floor, log10, cos, sin
-from matplotlib import pyplot as plt
+from math import sqrt, floor, log10
 from ClassLibrary import RunVars
 import PyGnuplot as gp
 pi = np.pi
 boltz = constants.Boltzmann
 avo = constants.Avogadro
 g = constants.g
+vec_z = np.array([0,0,1])
 
+def Normalise(vec):
+    return vec/np.linalg.norm(vec)
 
-class SingleParticle:
+def MakeRotationQuaternion(angle, vec):
+    a = np.cos(angle/2)
+    b = np.sin(angle/2)
+    axis = vec*b
+    axis = np.append(a,axis)
+    quat = quaternion.from_float_array(axis)
+    return quat
+
+def Tumble(diff_angle, spin_angle, vec_int):
+    diff_vec = Normalise(np.cross(vec_int, vec_z))
+    diff_quat = MakeRotationQuaternion(diff_angle, diff_vec)
+    vec_mid = quaternion.rotate_vectors(diff_quat, vec_int)
+    spin_vec = Normalise(vec_int)
+    spin_quat = MakeRotationQuaternion(spin_angle, spin_vec)
+    vec_final = quaternion.rotate_vectors(spin_quat, vec_mid)
+    return vec_final
+    
+class Bacterium:
+    def __init__(self, runvars):
+        self.seed = np.random.randint(2**31-1)
+        np.random.seed(self.seed)
+        self.time = np.full((runvars.sample_total), runvars.base_time)
+        self.vector_initial = np.array([1,0,0])
+        self.pos_initial = np.array([0,0,0])
+        
+    def Linear(self, runvars):
+        self.std_dev_linear = 2*runvars.step_linear*sqrt(runvars.sample_steps_linear*0.25)
+        self.linear_diffusion = np.random.normal(0.0, self.std_dev_linear,(runvars.sample_total, 3))
+    
+    def Rotational(self, runvars):
+        self.std_dev_rotational = 2*runvars.step_rotational*sqrt(runvars.sample_steps_rotational*0.25)
+        self.rotational_sample = np.random.normal(0.0, self.std_dev_rotational,(2, runvars.sample_total))
+        self.diffusion_sample = np.sqrt(np.square(self.rotational_sample[0]) + np.square(self.rotational_sample[1]))
+        self.spin_sample = np.random.random(runvars.sample_total)*pi
+        self.vectors_cartesian = np.zeros((runvars.sample_total,3))
+        self.vectors_cartesian[0] = Tumble(self.diffusion_sample[0], self.spin_sample[0], self.vector_initial)
+        for i in range(1,runvars.sample_total):
+            self.vectors_cartesian[i] = Tumble(self.diffusion_sample[i], self.spin_sample[i], self.vectors_cartesian[i-1])
+        
+    def Graph_Rotational(self):
+        self.graph_input = np.swapaxes(self.vectors_cartesian,0,1)
+        gp.s(self.graph_input)
+        gp.c('reset')
+        gp.c('set ticslevel 0')
+        gp.c('set view equal xyz')
+        gp.c('splot "tmp.dat" u 1:2:3')
+
+class SingleParticle_gold:
     def __init__(self, d):
         self.seed = np.random.randint(2**31-1)
         np.random.seed(self.seed)
@@ -64,7 +114,7 @@ class SingleParticle:
             if self.state == 0 and self.sim_time+d.tumble_length < d.sample_total:
                 self.sim_time = self.sim_time + d.tumble_length
                 self.tumble_x = np.random.rand()*2*pi
-                self.tumble_rot = R.from_euler('xyx',(self.tumble_x, d.tumble_angle_rad, -self.tumble_x))
+                self.tumble_rot = R.from_euler('yx',(d.tumble_angle_rad, self.tumble_x))
                 for x in range(int(self.sim_time), int(d.sample_total)):
                     self.vectors_cartesian[x] = self.tumble_rot.apply(self.vectors_cartesian[x])
                 self.state=1
@@ -96,11 +146,14 @@ class SingleParticle:
     def Graph_Rotational(self):
         self.graph_input = np.swapaxes(self.vectors_cartesian,0,1)
         gp.s(self.graph_input)
+        gp.c('reset')
+        gp.c('set ticslevel 0')
+        gp.c('set view equal xyz')
         gp.c('splot "tmp.dat" u 1:2:3')
     
         
 
-def SingleParticleAnalysis(z,d):
+def LinearDiffusionAnalysis(z,d):
     linear = np.cumsum(z.linear_sample, axis=0)
     tau = d.base_time
     sample_total = floor(log10(d.run_time/d.base_time))
@@ -119,6 +172,7 @@ def SingleParticleAnalysis(z,d):
         tau = tau*10
     results[1] = results[2]*6*d.diffusion_constant_linear
     gp.s(results)
+    gp.c('reset')
     gp.c('set logscale xy 10')
     gp.c('set xlabel "{/Symbol t} (s)"')
     gp.c('set ylabel "MSD (m^2)"')
@@ -145,6 +199,7 @@ def RotationalAnalysis(z,d, graph=True):
         tau = tau*10
     results[1] = results[2]*4*d.diffusion_constant_rotational
     gp.s(results)
+    gp.c('reset')
     gp.c('set logscale xy 10')
     gp.c('set xlabel "{/Symbol t} (s)"')
     gp.c('set ylabel "MSD ({/Symbol q}^2)"')
@@ -153,34 +208,6 @@ def RotationalAnalysis(z,d, graph=True):
     
     
     
-def SingleParticleFull():
-    x = RunVars()
-    x.Build()
-    z = SingleParticle(x)
-    SingleParticleAnalysis(z,x)
-    
-def MultiParticleDiffusion(particle_total, d):
-    particles = [ 0 for x in range(particle_total)]
-    for x in range(particle_total):
-        particles[x] = SingleParticle(d)
-        particles[x].Linear(d)
-    return particles
-
-def MultiParticleAnalysis(z,d):
-    results = [SingleParticleAnalysis(z[x],d,graph=False) for x in range(len(z))]
-    labels = ['x','y','z']
-    expected_msd = 2*d.diffusion_constant_linear*results[0][3]
-    for x in range(3):
-        plt.title("Expected vs Actual MSD - {label}".format(label=labels[x]))
-        plt.xlabel("Tau (s)")
-        plt.ylabel("{label}^2 (m^2)".format(label=labels[x]))
-        plt.xscale("log")
-        plt.yscale("log")
-        for y in range(len(z)):
-            plt.plot(results[y][3], results[y][x], 'r-')
-        plt.plot(results[y][3], expected_msd, 'b-')
-        plt.show()
-    return results
 
 
     
