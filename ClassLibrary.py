@@ -71,8 +71,8 @@ class RunVars:
         self.step_time_rotational = 1.0/self.step_rate_rotational
         self.sample_steps_rotational = self.step_rate_rotational*self.base_time
         # Build for basic fixed run&tumble
-        self.run_length = np.round((self.run_duration/self.base_time))
-        self.tumble_length = np.round((self.tumble_duration/self.base_time))
+        self.run_length = int(np.round((self.run_duration/self.base_time)))
+        self.tumble_length = int(np.round((self.tumble_duration/self.base_time)))
         self.run_step = self.run_speed*self.base_time
         self.tumble_angle_rad = np.deg2rad(self.tumble_angle_deg)
 

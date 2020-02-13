@@ -18,6 +18,10 @@ avo = constants.Avogadro
 g = constants.g
 vec_z = np.array([0,0,1])
 
+from numpy.random import Generator, PCG64, SeedSequence
+
+
+
 def Normalise(vec):
     return vec/np.linalg.norm(vec)
 
@@ -40,9 +44,9 @@ def Tumble(diff_angle, spin_angle, vec_int):
     
 class Bacterium:
     def __init__(self, runvars):
-        self.seed = np.random.randint(2**31-1)
-        np.random.seed(self.seed)
-        self.time = np.full((runvars.sample_total), runvars.base_time)
+        self.seed = SeedSequence()
+        self.rand_gen = Generator(PCG64(self.seed))
+        self.time = np.cumsum(np.append(0.0,np.full((runvars.sample_total), runvars.base_time)))
         self.vector_initial = np.array([1,0,0])
         self.pos_initial = np.array([0,0,0])
         
@@ -52,14 +56,77 @@ class Bacterium:
     
     def Rotational(self, runvars):
         self.std_dev_rotational = 2*runvars.step_rotational*sqrt(runvars.sample_steps_rotational*0.25)
-        self.rotational_sample = np.random.normal(0.0, self.std_dev_rotational,(2, runvars.sample_total))
+        self.rotational_sample = self.rand_gen.normal(0.0, self.std_dev_rotational,(2, runvars.sample_total))
         self.diffusion_sample = np.sqrt(np.square(self.rotational_sample[0]) + np.square(self.rotational_sample[1]))
-        self.spin_sample = np.random.random(runvars.sample_total)*pi
+        self.spin_sample = np.random.random(runvars.sample_total)*2*pi
         self.vectors_cartesian = np.zeros((runvars.sample_total,3))
         self.vectors_cartesian[0] = Tumble(self.diffusion_sample[0], self.spin_sample[0], self.vector_initial)
         for i in range(1,runvars.sample_total):
             self.vectors_cartesian[i] = Tumble(self.diffusion_sample[i], self.spin_sample[i], self.vectors_cartesian[i-1])
+      
+    def RunTumble_Basic(self, runvars):
+        vector_current = self.vector_initial
+        self.displacement = np.zeros((runvars.sample_total,3))
+        self.state = 0
+        self.sim_time = 0
+        while self.sim_time < runvars.sample_total:
+            if self.state == 0 and self.sim_time+runvars.run_length <= runvars.sample_total:
+                for i in range(self.sim_time, self.sim_time+runvars.run_length):
+                    self.displacement[i] = vector_current*runvars.run_step
+                self.sim_time = self.sim_time + runvars.run_length
+                self.state=1
+            elif self.state == 1 and self.sim_time+runvars.tumble_length <= runvars.sample_total:
+                self.sim_time = self.sim_time + runvars.tumble_length
+                tumble_spin = np.random.random()*2*pi
+                vector_current = Tumble(runvars.tumble_angle_rad,tumble_spin,vector_current)
+                self.state = 0
+            else:
+                break
         
+    def Complete(self, runvars):
+        self.std_dev_linear = 2*runvars.step_linear*sqrt(runvars.sample_steps_linear*0.25)
+        self.linear_diffusion = self.rand_gen.normal(0.0, self.std_dev_linear,(runvars.sample_total, 3))
+        self.std_dev_rotational = 2*runvars.step_rotational*sqrt(runvars.sample_steps_rotational*0.25)
+        self.rotational_sample = self.rand_gen.normal(0.0, self.std_dev_rotational,(2, runvars.sample_total))
+        self.diffusion_sample = np.sqrt(np.square(self.rotational_sample[0]) + np.square(self.rotational_sample[1]))
+        self.spin_sample = self.rand_gen.uniform(0.0,2*pi,runvars.sample_total)
+        self.vectors_cartesian = np.zeros((runvars.sample_total,3))
+        self.vectors_cartesian = np.vstack((self.vector_initial, self.vectors_cartesian))
+        self.displacement = np.zeros((runvars.sample_total,3))
+        self.displacement += self.linear_diffusion
+        self.displacement = np.vstack((self.pos_initial, self.displacement))
+        self.state = 0
+        self.sim_time = 0
+        while self.sim_time < runvars.sample_total:
+            if self.state == 0 and self.sim_time + runvars.run_length <= runvars.sample_total:
+                for i in range(self.sim_time, self.sim_time+runvars.run_length):
+                    self.vectors_cartesian[i+1] = Tumble(self.diffusion_sample[i],self.spin_sample[i],self.vectors_cartesian[i])
+                    self.displacement[i+1] += self.vectors_cartesian[i+1]*runvars.run_step
+                self.sim_time += runvars.run_length
+                self.state = 1
+            elif self.state == 0:
+                for i in range(self.sim_time, runvars.sample_total):
+                    self.vectors_cartesian[i+1] = Tumble(self.diffusion_sample[i],self.spin_sample[i],self.vectors_cartesian[i])
+                    self.displacement[i+1] += self.vectors_cartesian[i+1]*runvars.run_step
+                break
+            elif self.state == 1 and self.sim_time + runvars.tumble_length <= runvars.sample_total:
+                for i in range(self.sim_time, self.sim_time+runvars.tumble_length):
+                    self.vectors_cartesian[i+1] = Tumble(self.diffusion_sample[i],self.spin_sample[i],self.vectors_cartesian[i])
+                self.sim_time += runvars.tumble_length
+                tumble_spin = np.random.random()*2*pi
+                j = self.sim_time
+                self.vectors_cartesian[j] = Tumble(runvars.tumble_angle_rad, tumble_spin, self.vectors_cartesian[j])
+                self.state = 0
+            elif self.state == 1:
+                for i in range(self.sim_time, runvars.sample_total):
+                    self.vectors_cartesian[i+1] = Tumble(self.diffusion_sample[i],self.spin_sample[i],self.vectors_cartesian[i])
+                break
+            else:
+                print("Unknown expection occurred at sim_time = {self.sim_time}",)
+                break
+        self.total_displacement = np.cumsum(self.displacement, axis=0)
+        
+                
     def Graph_Rotational(self):
         self.graph_input = np.swapaxes(self.vectors_cartesian,0,1)
         gp.s(self.graph_input)
@@ -156,7 +223,7 @@ class SingleParticle_gold:
 def LinearDiffusionAnalysis(z,d):
     linear = np.cumsum(z.linear_sample, axis=0)
     tau = d.base_time
-    sample_total = floor(log10(d.run_time/d.base_time))
+    sample_total = floor(np.log2(d.run_time/d.base_time))
     results = [np.zeros(sample_total) for x in range(3)]
     run_total = d.sample_total
     for i in range(sample_total):
@@ -169,7 +236,7 @@ def LinearDiffusionAnalysis(z,d):
                 results_stack[x] = linear[(x+1)*tau_i][y]-linear[x*tau_i][y]
             results_stack_2 = results_stack**2
             results[0][i] = results[0][i] + np.mean(results_stack_2)
-        tau = tau*10
+        tau = tau*2
     results[1] = results[2]*6*d.diffusion_constant_linear
     gp.s(results)
     gp.c('reset')
