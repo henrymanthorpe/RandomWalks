@@ -236,6 +236,8 @@ def LinearDiffusionAnalysis(z,d):
     results = [np.zeros(sample_total) for x in range(3)]
     run_total = d.sample_total
     for i in range(sample_total):
+        if tau > 1:
+            break
         results[2][i] = tau
         sample_size = floor(d.run_time/tau)
         tau_i = floor(run_total/sample_size)
@@ -254,6 +256,7 @@ def LinearDiffusionAnalysis(z,d):
     gp.c('set ylabel "MSD (m^2)"')
     gp.c('set title "Analysis of Linear Diffusion Mean Squared Displacement"')
     gp.c('plot "tmp.dat" u 3:1 w points title "Actual MSD", "tmp.dat" u 3:2 w lines title "Expected MSD"')
+    return results
     
 
 
@@ -264,6 +267,8 @@ def RotationalAnalysis(z,d, graph=True):
     results = [np.zeros(sample_total) for x in range(3)]
     run_total = d.sample_total
     for i in range(sample_total):
+        if tau > 1:
+            break
         results[2][i] = tau
         sample_size = floor(d.run_time/tau)
         tau_i = floor(run_total/sample_size)
@@ -282,6 +287,7 @@ def RotationalAnalysis(z,d, graph=True):
     gp.c('set ylabel "MSD ({/Symbol q}^2)"')
     gp.c('set title "Analysis of Rotational Diffusion Mean Squared Displacement"')
     gp.c('plot "tmp.dat" u 3:1 w points title "Actual MSD", "tmp.dat" u 3:2 w lines title "Expected MSD"')
+    return results
     
     
     

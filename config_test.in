@@ -1,0 +1,30 @@
+[phys]
+mol_mass = 10
+shape = Sphere
+radius = 1e-6
+radius_major = 
+radius_minor = 
+
+[env]
+temp = 297
+viscosity = 8.9e-4
+f_x = 0
+f_y = 0
+f_z = 0
+gravity = no
+
+[time]
+run_time = 20
+base_time = 1e-3
+
+[bact]
+run = yes
+run_speed = 1.5e-5
+run_var = yes
+run_mean = 0.9
+tumble = yes
+tumble_angle_var = yes
+tumble_angle_mean = 70
+tumble_duration_var = yes
+tumble_duration_mean = 0.1
+

@@ -1,0 +1,31 @@
+[phys]
+mol_mass = 1
+shape = Sphere
+radius_sphere = 1
+radius_major = 
+radius_minor = 
+
+[env]
+temp = 1
+viscosity = 1
+f_x = 0
+f_y = ,
+f_z = 0
+base_time = 1
+
+[time]
+run_time = 1
+
+[bact]
+run = yes
+run_speed = 1
+run_var = no
+run_mean = 1
+tumble = yes
+tumble_angle_var = no
+tumble_angle_mean = 1
+tumble_duration_var = no
+tumble_duration_mean = 1
+pause_var = 
+pause_mean = 
+
