@@ -9,7 +9,7 @@ import numpy as np
 import quaternion
 from scipy import constants
 from scipy.spatial.transform import Rotation as R
-from math import sqrt, floor, log10
+from math import sqrt, floor
 from ClassLibrary import RunVars
 import PyGnuplot as gp
 pi = np.pi
@@ -19,6 +19,7 @@ g = constants.g
 vec_z = np.array([0,0,1])
 
 from numpy.random import Generator, PCG64, SeedSequence
+
 
 
 
@@ -126,6 +127,14 @@ class Bacterium:
                 break
         self.total_displacement = np.cumsum(self.displacement, axis=0)
         
+    def Graph_Linear(self):
+        self.graph_input = np.swapaxes(self.total_displacement,0,1)
+        gp.s(self.graph_input)
+        gp.c('reset')
+        gp.c('set ticslevel 0')
+        gp.c('set view equal xyz')
+        gp.c('splot "tmp.dat" u 1:2:3 with lines')
+        
                 
     def Graph_Rotational(self):
         self.graph_input = np.swapaxes(self.vectors_cartesian,0,1)
@@ -133,7 +142,7 @@ class Bacterium:
         gp.c('reset')
         gp.c('set ticslevel 0')
         gp.c('set view equal xyz')
-        gp.c('splot "tmp.dat" u 1:2:3')
+        gp.c('splot "tmp.dat" u 1:2:3 with lines')
 
 class SingleParticle_gold:
     def __init__(self, d):
@@ -221,7 +230,7 @@ class SingleParticle_gold:
         
 
 def LinearDiffusionAnalysis(z,d):
-    linear = np.cumsum(z.linear_sample, axis=0)
+    linear = np.cumsum(z.linear_diffusion, axis=0)
     tau = d.base_time
     sample_total = floor(np.log2(d.run_time/d.base_time))
     results = [np.zeros(sample_total) for x in range(3)]
@@ -245,6 +254,7 @@ def LinearDiffusionAnalysis(z,d):
     gp.c('set ylabel "MSD (m^2)"')
     gp.c('set title "Analysis of Linear Diffusion Mean Squared Displacement"')
     gp.c('plot "tmp.dat" u 3:1 w points title "Actual MSD", "tmp.dat" u 3:2 w lines title "Expected MSD"')
+    
 
 
 def RotationalAnalysis(z,d, graph=True):
