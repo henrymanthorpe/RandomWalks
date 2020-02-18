@@ -101,7 +101,7 @@ class Bacterium:
                         current_run_length = int(np.round(self.rand_gen.exponential(self.vars.run_length_mean)))
                     else:
                         current_run_length = self.vars.run_length_mean
-                    if self.elapsed_time + current_run_length <= self.vars.sample_total:
+                    if self.elapsed_time + current_run_length < self.vars.sample_total:
                         for i in range(self.elapsed_time, self.elapsed_time+current_run_length):
                             self.vectors_cartesian[i+1] = Tumble(self.diffusion_sample[i],self.spin_sample[i],self.vectors_cartesian[i])
                             self.displacement[i+1] += self.vectors_cartesian[i+1]*self.vars.run_step
@@ -118,13 +118,13 @@ class Bacterium:
                     q += 1
                     if self.vars.tumble_behaviour == True:
                         if self.vars.tumble_duration_variation == True:
-                            current_tumble_length = int(np.round(self.rand_gen.exponential(self.vars.tumble_length_mean)))
+                            current_tumble_length = int(np.round(self.rand_gen.exponential()))
                         else:
                             current_tumble_length = self.vars.tumble_length_mean
-                    if self.elapsed_time + current_tumble_length <= self.vars.sample_total:
-                        for i in range(self.elapsed_time, self.elapsed_time+self.vars.tumble_length_mean):
+                    if self.elapsed_time + current_tumble_length < self.vars.sample_total:
+                        for i in range(self.elapsed_time, self.elapsed_time+current_tumble_length):
                             self.vectors_cartesian[i+1] = Tumble(self.diffusion_sample[i],self.spin_sample[i],self.vectors_cartesian[i])
-                        self.elapsed_time += self.vars.tumble_length_mean
+                        self.elapsed_time += current_tumble_length
                         tumble_spin = np.random.random()*2*pi
                         j = self.elapsed_time
                         self.vectors_cartesian[j] = Tumble(self.vars.tumble_angle_mean, tumble_spin, self.vectors_cartesian[j])

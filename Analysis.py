@@ -33,7 +33,6 @@ def LinearDiffusion(bacterium):
                 results_stack[x] = linear[(x+1)*tau_i][y]-linear[x*tau_i][y]
             results_stack_2 = results_stack**2
             results[i] = results[i] + np.mean(results_stack_2)
-    results = np.vstack((results,tau))
     return results
 
 def RotationalDiffusion(bacterium):
@@ -51,7 +50,6 @@ def RotationalDiffusion(bacterium):
             results_stack[x] = np.arccos(results_stack[x])
         results_stack_2 = results_stack**2
         results[i] = np.mean(results_stack_2)
-    results = np.vstack((results,tau))
     return results
 
 def LinearMotility(bacterium):
@@ -69,7 +67,6 @@ def LinearMotility(bacterium):
                 results_stack[x] = linear[(x+1)*tau_i][y]-linear[x*tau_i][y]
             results_stack_2 = results_stack**2
             results[i] = results[i] + np.mean(results_stack_2)
-    results = np.vstack((results,tau))
     return results
 
 def RotationalMotility(bacterium):
@@ -87,6 +84,5 @@ def RotationalMotility(bacterium):
             results_stack[x] = np.arccos(results_stack[x])
         results_stack_2 = results_stack**2
         results[i] = np.mean(results_stack_2)
-    results = np.vstack((results,tau))
     return results
     
