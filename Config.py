@@ -91,6 +91,13 @@ pause_var =
 
 # Mean Pause Duration
 pause_mean =
+
+[seed]
+#RNG Variables
+
+# If a fixed seed is wanted to get repeatability, provide a entropy integer here
+# Else, leave blank for normal use.
+entropy =
     
     """
     f = open("default_config.in",'w')

@@ -9,4 +9,4 @@ pygnuplot/
 *.npy
 *.dat
 *.log
-
+*.in

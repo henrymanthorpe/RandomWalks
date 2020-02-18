@@ -16,7 +16,7 @@ class Bacteria:
         self.test_num = 0
         
     def Repeat(self, fname, repeats):
-        self.config_number += 1
+        self.test_num += 1
         self.config['config'+str(self.test_num)] = fname
         self.bacterium['set'+str(self.test_num)] = {}
         for i in range(repeats):

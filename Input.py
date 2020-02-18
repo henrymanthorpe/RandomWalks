@@ -26,11 +26,12 @@ class Variables:
             print("Or run with 'interactive=1' to input variables in the console.")
         else:
             config = Config.GetConfig(fname)
-            if config.sections() == ['phys', 'env', 'time', 'bact']:
+            if config.sections() == ['phys', 'env', 'time', 'bact','seed']:
                 self.phys = config['phys']
                 self.env = config['env']
                 self.time = config['time']
                 self.bact = config['bact']
+                self.entropy = config['seed'].get('entropy')
             else:
                 print("Error: Config file not formatted correctly.")
                 print("Please recreate options from default config and try again.")

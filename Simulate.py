@@ -38,12 +38,25 @@ class Bacterium:
     def __init__(self, fname):
         self.vars = Variables(fname)
         if self.vars.success == 1:
-            return 1
-        self.seed = SeedSequence()
+            print("Error: Variables did not import correctly.")
+            print("Please check config file is correct.")
+            self.failure = 1
+            return
+        if self.vars.entropy != '':
+            try:
+                self.seed = SeedSequence(int(self.vars.entropy))
+            except ValueError:
+                print("Error: Entropy value is not an integer.")
+                print("Please check config file is correct.")
+                self.failure = 1
+                return
+        else:
+            self.seed = SeedSequence()
         self.rand_gen = Generator(PCG64(self.seed))
         #self.time = np.cumsum(np.append(0.0,np.full((self.vars.sample_total), self.vars.base_time)))
         self.vector_initial = np.array([1,0,0])
         self.pos_initial = np.array([0,0,0])
+        
     
     def ReSeed(self,entropy):
         self.seed = SeedSequence(entropy)
@@ -58,10 +71,10 @@ class Bacterium:
         self.rotational_sample = self.rand_gen.normal(0.0, self.std_dev_rotational,(2, self.vars.sample_total))
         self.diffusion_sample = np.sqrt(np.square(self.rotational_sample[0]) + np.square(self.rotational_sample[1]))
         self.spin_sample = np.random.random(self.vars.sample_total)*2*pi
-        self.vectors_cartesian = np.zeros((self.vars.sample_total,3))
-        self.vectors_cartesian[0] = Tumble(self.diffusion_sample[0], self.spin_sample[0], self.vector_initial)
+        self.vectors_cartesian_diffusion = np.zeros((self.vars.sample_total,3))
+        self.vectors_cartesian_diffusion[0] = Tumble(self.diffusion_sample[0], self.spin_sample[0], self.vector_initial)
         for i in range(1,self.vars.sample_total):
-            self.vectors_cartesian[i] = Tumble(self.diffusion_sample[i], self.spin_sample[i], self.vectors_cartesian[i-1])
+            self.vectors_cartesian_diffusion[i] = Tumble(self.diffusion_sample[i], self.spin_sample[i], self.vectors_cartesian_diffusion[i-1])
         
     def Complete(self):
         self.std_dev_linear = 2*self.vars.step_linear*np.sqrt(self.vars.sample_steps_linear*0.25)
