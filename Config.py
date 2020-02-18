@@ -50,7 +50,7 @@ gravity = no
 # Simulation Variables
 
 # Total simulation time (s)
-run_time = 20
+sim_time = 20
 
 # Interval (step) time (s)
 base_time = 1e-3

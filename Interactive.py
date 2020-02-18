@@ -26,7 +26,7 @@ def Input():
             print("Error: That is not a numerical input")
     while True:
         try:
-            particle_shape = input("Select particle shape - (S)phere or (E)llipsoid (ELLIPSOIDS CURRENTLY DON'T WORK) : ")
+            particle_shape = input("Select particle shape - (S)phere or (E)llipsoid : ")
             if particle_shape.upper() == 'E' or particle_shape.lower()=='ellipsoid':
                 phys['shape'] = 'Ellipsoid'
                 phys['radius_sphere'] = ''
@@ -112,9 +112,9 @@ def Input():
     time = {}
     while True:
         try:
-            run_time = input("Input run time (s) : ")
-            if float(run_time) > 0:
-                time['run_time'] = run_time
+            sim_time = input("Input simulation time (s) : ")
+            if float(sim_time) > 0:
+                time['sime_time'] = sim_time
                 break
             else:
                 print("Error: Negative value not possible")

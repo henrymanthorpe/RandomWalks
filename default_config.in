@@ -11,9 +11,9 @@ mol_mass = 10
 shape = Sphere
 
 # Spherical radius (if Sphere)
-radius = 1e-6
+radius_sphere = 1e-6
 
-# Major and Minor axis radii (if Ellipsoid)
+# Semi-Major and Semi-Minor axis radii (if Ellipsoid)
 radius_major = 
 radius_minor =
 
@@ -38,7 +38,7 @@ gravity = no
 # Simulation Variables
 
 # Total simulation time (s)
-run_time = 20
+sim_time = 20
 
 # Interval (step) time (s)
 base_time = 1e-3
@@ -72,5 +72,12 @@ tumble_duration_var = yes
 
 # Mean Tumble duration (s)
 tumble_duration_mean = 0.1
+
+#(For No Tumbles - Rotation only by Diffusion)
+# Varying Pause Duration
+pause_var =
+
+# Mean Pause Duration
+pause_mean =
     
     
