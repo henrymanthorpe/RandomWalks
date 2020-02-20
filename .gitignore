@@ -10,3 +10,4 @@ pygnuplot/
 *.dat
 *.log
 *.in
+test.*
