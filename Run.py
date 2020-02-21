@@ -11,6 +11,7 @@ import os
 
 def SingleRun(fname):
     bacterium = Bacterium(fname)
+    bacterium.Rotational()
     bacterium.Complete()
     return bacterium
 

@@ -7,7 +7,7 @@ Created on Tue Feb 18 13:43:54 2020
 """
 import numpy as np
 
-def TauCalc(bacterium, tau_step):
+def TauCalc(bacterium):
     sample_total = int(np.floor(np.log2(bacterium.vars.sim_time/bacterium.vars.base_time)))
     tau = np.zeros(sample_total)
     tau_curr = bacterium.vars.base_time
@@ -19,8 +19,8 @@ def TauCalc(bacterium, tau_step):
 def MSD(disp,tau_i,sample_total):
     size = int(np.floor(sample_total/tau_i))
     delta = np.zeros((size,3))
-    for i in range(0,size*tau_i,tau_i):
-        delta[int(i/tau_i)] = np.sum(disp[i:(i+tau_i)],axis=0)
+    for i in range(size):
+        delta[i] = np.sum(disp[(tau_i*i):((i+1)*tau_i)],axis=0)
     delta = delta**2
     delta = np.sum(delta,axis=1)
     delta_mean = np.mean(delta)
@@ -29,8 +29,9 @@ def MSD(disp,tau_i,sample_total):
 def MSD_Rot(vect,tau_i,sample_total):
     size=int(np.floor(sample_total/tau_i))
     delta = np.zeros(size)
-    for i in range(0,size*tau_i,tau_i):
-        delta[int(i/tau_i)] = np.dot(vect[i],vect[i+tau_i])
+    for i in range(size):
+        delta[i] = np.dot(vect[i*tau_i],vect[(i+1)*tau_i])
+    delta = np.arccos(delta)
     delta = delta**2
     delta_mean = np.mean(delta)
     return delta_mean

@@ -114,27 +114,27 @@ class Graphing:
             gp.c('f(x) = 6*a')
             plot_string = plot_string + ' f(x)'
             gp.c(plot_string)
-        gp.c('set ylabel "MSD ({/Symbol q}^2)"')
-        gp.c('set title "Analysis of Rotational Diffusion Mean Squared Displacement"')
-        for key in self.bacteria.bacterium.keys():
-            gp.c("set terminal qt "+str(term))
-            plot_string = 'plot'
-            diffusion_constant_rotational = self.bacteria.bacterium[key]['bact0'].vars.diffusion_constant_rotational
-            tau = Analysis.TauCalc(self.bacteria.bacterium[key]['bact0'])
-            graph_out = 4*diffusion_constant_rotational*tau
-            graph_out = np.vstack((graph_out,tau))
-            dat_name = 'results/'+str(key)+'exp_msd_rot.dat'
-            gp.s(graph_out, dat_name)
-            plot_string = plot_string + ' "' + dat_name + '" u 2:1 with lines title "Expected MSD",'
-            for bact in self.bacteria.bacterium[key].keys():
-                self.bacteria.bacterium[key][bact].Rotational()
-                graph_out = Analysis.RotationalDiffusion(self.bacteria.bacterium[key][bact])
-                graph_out = np.vstack((graph_out, tau))
-                dat_name = 'results/'+str(key)+str(bact)+'msd_rot.dat'
-                gp.s(graph_out, dat_name)
-                plot_string = plot_string + ' "'+dat_name+'" u 2:1 with points title "'+str(bact)+' MSD",'
-            gp.c(plot_string)
-            term = term+1
+        # gp.c('set ylabel "MSD ({/Symbol q}^2)"')
+        # gp.c('set title "Analysis of Rotational Diffusion Mean Squared Displacement"')
+        # for key in self.bacteria.bacterium.keys():
+        #     gp.c("set terminal qt "+str(term))
+        #     plot_string = 'plot'
+        #     diffusion_constant_rotational = self.bacteria.bacterium[key]['bact0'].vars.diffusion_constant_rotational
+        #     tau = Analysis.TauCalc(self.bacteria.bacterium[key]['bact0'])
+        #     graph_out = 4*diffusion_constant_rotational*tau
+        #     graph_out = np.vstack((graph_out,tau))
+        #     dat_name = 'results/'+str(key)+'exp_msd_rot.dat'
+        #     gp.s(graph_out, dat_name)
+        #     plot_string = plot_string + ' "' + dat_name + '" u 2:1 with lines title "Expected MSD",'
+        #     for bact in self.bacteria.bacterium[key].keys():
+        #         self.bacteria.bacterium[key][bact].Rotational()
+        #         graph_out = Analysis.RotationalDiffusion(self.bacteria.bacterium[key][bact])
+        #         graph_out = np.vstack((graph_out, tau))
+        #         dat_name = 'results/'+str(key)+str(bact)+'msd_rot.dat'
+        #         gp.s(graph_out, dat_name)
+        #         plot_string = plot_string + ' "'+dat_name+'" u 2:1 with points title "'+str(bact)+' MSD",'
+        #     gp.c(plot_string)
+        #     term = term+1
             
     def MotilityDiffusionConstants(self, mean=True):
         gp.c('reset')
