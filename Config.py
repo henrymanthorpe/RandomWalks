@@ -9,7 +9,7 @@ Created on Fri Feb 14 19:48:13 2020
 import configparser
 
 
-def Default():
+def Default(save_dir=''):
     default_config = """
 # Default Configuration File
 
@@ -100,10 +100,11 @@ pause_mean =
 entropy =
     
     """
-    f = open("default_config.in",'w')
+    fname = save_dir+"default_config.in"
+    f = open(fname,'w')
     f.write(default_config)
     f.close()
-    print("Default Config File created as default_config.in \n")
+    print("Default Config File created as 'default_config.in' in "+save_dir+" \n")
     print("Please edit the contained values to those required for your needs.")
     
     

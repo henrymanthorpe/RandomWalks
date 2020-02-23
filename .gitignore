@@ -11,3 +11,6 @@ pygnuplot/
 *.log
 *.in
 test.*
+graphs/
+plots/
+

@@ -27,7 +27,9 @@ def MSD(disp,tau_i,sample_total):
     return delta_mean
 
 def MSD_Rot(vect,tau_i,sample_total):
-    size=int(np.floor(sample_total/tau_i))
+    size=int(np.floor(sample_total/tau_i)-1)
+    if size==0:
+        return -1
     delta = np.zeros(size)
     for i in range(size):
         delta[i] = np.dot(vect[i*tau_i],vect[(i+1)*tau_i])
