@@ -28,9 +28,9 @@ class Graphing:
         gp.c("reset")
         gp.c("set ticslevel 0")
         gp.c("set view equal xyz")
-        gp.c("set terminal emf size 1600,1200 font 'ariel' 14")
+        gp.c("set terminal pngcairo enhanced size 1600,1200 font 'ariel, 14'")
         for key in self.bacteria.bacterium.keys():
-            gp.c('set output "'+self.graph_dir+key+'_path.emf"')
+            gp.c('set output "'+self.graph_dir+key+'_path.png"')
             plot_string = 'splot'
             for bact in self.bacteria.bacterium[key].keys():
                 temp_out = self.bacteria.bacterium[key][bact].total_displacement
@@ -44,9 +44,9 @@ class Graphing:
         gp.c("reset")
         gp.c("set ticslevel 0")
         gp.c("set view equal xyz")
-        gp.c("set terminal emf size 1600,1200 font 'ariel' 14")
+        gp.c("set terminal pngcairo enhanced size 1600,1200 font 'ariel, 14'")
         for key in self.bacteria.bacterium.keys():
-            gp.c('set output "'+self.graph_dir+key+'_heading.emf"')
+            gp.c('set output "'+self.graph_dir+key+'_heading.png"')
             plot_string = 'splot'
             for bact in self.bacteria.bacterium[key].keys():
                 temp_out = self.bacteria.bacterium[key][bact].vectors_cartesian
@@ -63,9 +63,9 @@ class Graphing:
         gp.c('set ylabel "MSD (m^2)"')
         gp.c('set key top left')
         gp.c('set title "Analysis of Linear Diffusion Mean Squared Displacement"')
-        gp.c("set terminal emf size 1600,1200 font 'ariel' 14")
+        gp.c("set terminal pngcairo enhanced size 1600,1200 font 'ariel, 14'")
         for key in self.bacteria.bacterium.keys():
-            gp.c('set output "'+self.graph_dir+key+'_brownian_linear.emf"')
+            gp.c('set output "'+self.graph_dir+key+'_brownian_linear.png"')
             plot_string = 'plot'
             tau = Analysis.TauCalc(self.bacteria.bacterium[key]['bact0'])
             p = len(tau)
@@ -102,7 +102,7 @@ class Graphing:
         gp.c('set ylabel "MSD ({/Symbol q}^2)"')
         gp.c('set title "Analysis of Rotational Diffusion Mean Squared Displacement"')
         for key in self.bacteria.bacterium.keys():
-            gp.c('set output "'+self.graph_dir+key+'_brownian_rotational.emf"')
+            gp.c('set output "'+self.graph_dir+key+'_brownian_rotational.png"')
             plot_string = 'plot'
             tau = Analysis.TauCalc(self.bacteria.bacterium[key]['bact0'])
             p = len(tau)
@@ -144,9 +144,9 @@ class Graphing:
         gp.c('set ylabel "MSD (m^2)"')
         gp.c('set key top left')
         gp.c('set title "Analysis of Linear Motility Mean Squared Displacement"')
-        gp.c("set terminal emf size 1600,1200 font 'ariel' 14")
+        gp.c("set terminal pngcairo enhanced size 1600,1200 font 'ariel, 14'")
         for key in self.bacteria.bacterium.keys():
-            gp.c('set output "'+self.graph_dir+key+'_motility_linear.emf"')
+            gp.c('set output "'+self.graph_dir+key+'_motility_linear.png"')
             plot_string = 'plot'
             tau = Analysis.TauCalc(self.bacteria.bacterium[key]['bact0'])
             gp.c('set xrange ['+str(tau.min()*0.75)+':'+str(tau.max()*1.5)+']')
@@ -176,7 +176,7 @@ class Graphing:
         gp.c('set ylabel "MSD ({/Symbol q}^2)"')
         gp.c('set title "Analysis of Rotational Motility Mean Squared Displacement"')
         for key in self.bacteria.bacterium.keys():
-            gp.c('set output "'+self.graph_dir+key+'_motility_rotational.emf"')
+            gp.c('set output "'+self.graph_dir+key+'_motility_rotational.png"')
             plot_string = 'plot'
             tau = Analysis.TauCalc(self.bacteria.bacterium[key]['bact0'])
             gp.c('set xrange ['+str(tau.min()*0.75)+':'+str(tau.max()*1.5)+']')
@@ -210,7 +210,7 @@ class Graphing:
             y = self.results[key+'linear'][0]
             weight = self.results[key+'linear'][2]
             self.fit_linear[key], self.stats_linear[key] = np.polynomial.polynomial.polyfit(x,y,1,full=True,w=1/weight)
-            gp.c('set output "'+self.graph_dir+key+'_motility_linear_fit.emf"')
+            gp.c('set output "'+self.graph_dir+key+'_motility_linear_fit.png"')
             plot_string = 'plot'
             gp.c('set xrange ['+str(x.min()*0.75)+':'+str(x.max()*1.5)+']')
             graph_out = np.vstack((x,y,weight))
