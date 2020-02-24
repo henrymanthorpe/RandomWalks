@@ -12,6 +12,7 @@ import sys
 import getopt
 import os
 from Config import Default
+import Interactive
 
 help_text = """ Build.py <directory> <-h/r/t --help/repeats/threads>
 Runs all configs in directory for given number of repeats in parallel.
@@ -38,13 +39,16 @@ def main(argv):
     repeats = 1
     threads = 1
     try:
-        opts, args = getopt.gnu_getopt(argv[1:], 'hc:r:t:',['help','repeats=','threads='])
+        opts, args = getopt.gnu_getopt(argv[1:], 'hir:t:',['help','interactive','repeats=','threads='])
     except getopt.GetoptError:
         print(help_text)
         sys.exit()
     for opt, var in opts:
         if opt in ('-h','--help'):
             print(help_text)
+            sys.exit()
+        elif opt in ('-i','--interactive'):
+            Interactive.Input()
             sys.exit()
         elif opt in ('-r','--repeats'):
             repeats = int(var)
@@ -66,8 +70,6 @@ def main(argv):
         if not os.path.exists(config_dir):
             os.mkdir(config_dir)
             print("Config Directory not found, making "+config_dir)
-            Default()
-            sys.exit()
         plot_dir = arg+'plots/'
         if not os.path.exists(plot_dir):
             os.mkdir(plot_dir)
@@ -76,10 +78,13 @@ def main(argv):
         if not os.path.exists(graph_dir):
             os.mkdir(graph_dir)
             print("Graph Directory not found, making "+graph_dir)
+        if len(os.listdir(config_dir)) == 0:
+            Default(config_dir)
+            sys.exit()
 
         bact = Bacteria()
-        bact.ConfigSweep_Parallel(arg,repeats,threads)
-        graph = Graphing(bact, graph_dir)
+        bact.ConfigSweep_Parallel(config_dir,repeats,threads)
+        graph = Graphing(bact, graph_dir, plot_dir)
         graph.BrownianDiffusionConstants()
         graph.MotilityDiffusionConstants()
 

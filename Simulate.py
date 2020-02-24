@@ -11,6 +11,7 @@ import quaternion
 from Input import Variables
 from numpy.random import Generator, PCG64, SeedSequence
 
+
 vec_z = np.array([0,0,1])
 pi = np.pi
 

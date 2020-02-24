@@ -15,14 +15,14 @@ import PyGnuplot as gp
         
 
 class Graphing:
-    def __init__(self, bacteria, run_dir):
+    def __init__(self, bacteria, graph_dir, plot_dir):
         self.bacteria = bacteria
         self.results = {}
         self.fit_linear = {}
         self.stats_linear = {}
         self.plots = {}
-        self.graph_dir = run_dir+'graphs/'
-        self.plot_dir = run_dir+'plots/'
+        self.graph_dir = graph_dir
+        self.plot_dir = plot_dir
 
     def BacteriaPaths(self):
         gp.c("reset")
@@ -30,7 +30,7 @@ class Graphing:
         gp.c("set view equal xyz")
         gp.c("set terminal emf size 1600,1200 font 'ariel' 14")
         for key in self.bacteria.bacterium.keys():
-            gp.c('set output "'+self.save_dir+key+'_path.emf"')
+            gp.c('set output "'+self.graph_dir+key+'_path.emf"')
             plot_string = 'splot'
             for bact in self.bacteria.bacterium[key].keys():
                 temp_out = self.bacteria.bacterium[key][bact].total_displacement
@@ -46,7 +46,7 @@ class Graphing:
         gp.c("set view equal xyz")
         gp.c("set terminal emf size 1600,1200 font 'ariel' 14")
         for key in self.bacteria.bacterium.keys():
-            gp.c('set output "'+self.save_dir+key+'_heading.emf"')
+            gp.c('set output "'+self.graph_dir+key+'_heading.emf"')
             plot_string = 'splot'
             for bact in self.bacteria.bacterium[key].keys():
                 temp_out = self.bacteria.bacterium[key][bact].vectors_cartesian
@@ -65,9 +65,8 @@ class Graphing:
         gp.c('set title "Analysis of Linear Diffusion Mean Squared Displacement"')
         gp.c("set terminal emf size 1600,1200 font 'ariel' 14")
         for key in self.bacteria.bacterium.keys():
-            gp.c('set output "'+self.save_dir+key+'brownian_linear.emf"')
+            gp.c('set output "'+self.graph_dir+key+'_brownian_linear.emf"')
             plot_string = 'plot'
-            diffusion_constant_linear = self.bacteria.bacterium[key]['bact0'].vars.diffusion_constant_linear
             tau = Analysis.TauCalc(self.bacteria.bacterium[key]['bact0'])
             p = len(tau)
             q = len(self.bacteria.bacterium[key])
@@ -82,8 +81,11 @@ class Graphing:
                 plot_string = plot_string + ' "'+dat_name+'" u 2:1 with points title "'+str(bact)+' MSD",'
                 i=i+1
             mean_results = np.mean(results_array, axis=0)
-            std_dev = np.std(results_array, axis=0)
-            std_error = std_dev/np.sqrt(q)
+            if q > 1:
+                std_dev = np.std(results_array, axis=0)
+                std_error = std_dev/np.sqrt(q)
+            else:
+                std_error = np.ones(len(tau))
             self.results[key+'linear_brownian'] = np.vstack((mean_results,tau,std_error))
             dat_name = self.plot_dir+str(key)+'msd_lin_brownian_mean.dat'
             gp.s(self.results[key+'linear_brownian'], dat_name)
@@ -100,9 +102,8 @@ class Graphing:
         gp.c('set ylabel "MSD ({/Symbol q}^2)"')
         gp.c('set title "Analysis of Rotational Diffusion Mean Squared Displacement"')
         for key in self.bacteria.bacterium.keys():
-            gp.c('set output "'+self.save_dir+key+'_brownian_rotational.emf"')
+            gp.c('set output "'+self.graph_dir+key+'_brownian_rotational.emf"')
             plot_string = 'plot'
-            diffusion_constant_rotational = self.bacteria.bacterium[key]['bact0'].vars.diffusion_constant_rotational
             tau = Analysis.TauCalc(self.bacteria.bacterium[key]['bact0'])
             p = len(tau)
             q = len(self.bacteria.bacterium[key])
@@ -117,8 +118,11 @@ class Graphing:
                 plot_string = plot_string + ' "'+dat_name+'" u 2:1 with points title "'+str(bact)+' MSD",'
                 i=i+1
             mean_results = np.mean(results_array, axis=0)
-            std_dev = np.std(results_array, axis=0)
-            std_error = std_dev/np.sqrt(q)
+            if q > 1:
+                std_dev = np.std(results_array, axis=0)
+                std_error = std_dev/np.sqrt(q)
+            else:
+                std_error = np.ones(len(tau))
             self.results[key+'rotational_brownian'] = np.vstack((mean_results,tau,std_error))
             dat_name = self.plot_dir+str(key)+'msd_rot_brownian_mean.dat'
             gp.s(self.results[key+'rotational_brownian'], dat_name)
@@ -142,7 +146,7 @@ class Graphing:
         gp.c('set title "Analysis of Linear Motility Mean Squared Displacement"')
         gp.c("set terminal emf size 1600,1200 font 'ariel' 14")
         for key in self.bacteria.bacterium.keys():
-            gp.c('set output "'+self.save_dir+key+'_motility_linear.emf"')
+            gp.c('set output "'+self.graph_dir+key+'_motility_linear.emf"')
             plot_string = 'plot'
             tau = Analysis.TauCalc(self.bacteria.bacterium[key]['bact0'])
             gp.c('set xrange ['+str(tau.min()*0.75)+':'+str(tau.max()*1.5)+']')
@@ -159,8 +163,11 @@ class Graphing:
                 plot_string = plot_string + ' "'+dat_name+'" u 2:1 with points title "'+str(bact)+' MSD",'
                 i=i+1
             mean_results = np.mean(results_array, axis=0)
-            std_dev = np.std(results_array, axis=0)
-            std_error = std_dev/np.sqrt(q)
+            if q > 1:
+                std_dev = np.std(results_array, axis=0)
+                std_error = std_dev/np.sqrt(q)
+            else:
+                std_error = np.ones(len(tau))
             self.results[key+'linear'] = np.vstack((mean_results,tau,std_error))
             dat_name = self.plot_dir+str(key)+'msd_lin_mean.dat'
             gp.s(self.results[key+'linear'], dat_name)
@@ -169,7 +176,7 @@ class Graphing:
         gp.c('set ylabel "MSD ({/Symbol q}^2)"')
         gp.c('set title "Analysis of Rotational Motility Mean Squared Displacement"')
         for key in self.bacteria.bacterium.keys():
-            gp.c('set output "'+self.save_dir+key+'_motility_rotational.emf"')
+            gp.c('set output "'+self.graph_dir+key+'_motility_rotational.emf"')
             plot_string = 'plot'
             tau = Analysis.TauCalc(self.bacteria.bacterium[key]['bact0'])
             gp.c('set xrange ['+str(tau.min()*0.75)+':'+str(tau.max()*1.5)+']')
@@ -186,8 +193,11 @@ class Graphing:
                 plot_string = plot_string + ' "'+dat_name+'" u 2:1 with points title "'+str(bact)+' MSD",'
                 i = i+1
             mean_results = np.mean(results_array, axis=0)
-            std_dev = np.std(results_array, axis=0)
-            std_error = std_dev/np.sqrt(q)
+            if q > 1:
+                std_dev = np.std(results_array, axis=0)
+                std_error = std_dev/np.sqrt(q)
+            else:
+                std_error = np.ones(len(tau))
             self.results[key+'rotational'] = np.vstack((mean_results,tau,std_error))
             dat_name = self.plot_dir+str(key)+'msd_rot_mean.dat'
             gp.s(self.results[key+'rotational'], dat_name)
@@ -200,7 +210,7 @@ class Graphing:
             y = self.results[key+'linear'][0]
             weight = self.results[key+'linear'][2]
             self.fit_linear[key], self.stats_linear[key] = np.polynomial.polynomial.polyfit(x,y,1,full=True,w=1/weight)
-            gp.c('set output "'+self.save_dir+key+'_motility_linear_fit.emf"')
+            gp.c('set output "'+self.graph_dir+key+'_motility_linear_fit.emf"')
             plot_string = 'plot'
             gp.c('set xrange ['+str(x.min()*0.75)+':'+str(x.max()*1.5)+']')
             graph_out = np.vstack((x,y,weight))

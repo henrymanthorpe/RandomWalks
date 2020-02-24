@@ -13,4 +13,5 @@ pygnuplot/
 test.*
 graphs/
 plots/
-
+Batches/
+configs/
