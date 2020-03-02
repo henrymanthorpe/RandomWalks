@@ -8,8 +8,8 @@ Created on Fri Feb 14 22:35:50 2020
 import configparser
 import numpy as np
 
+
 def Input():
-    
     config = configparser.ConfigParser(allow_no_value=True)
     print("Welcome to the guided Variable builder \n")
     print("--- Particle Variables ---")
@@ -284,8 +284,3 @@ def Input():
     print("\nConfig saved to interactive.in for future use/reference")
     print("Exiting guided Variable builder")
     return config
-
-    
-            
-                            
-                            

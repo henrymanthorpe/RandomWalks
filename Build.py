@@ -35,31 +35,34 @@ Exports
 
 """
 
+
 def main(argv):
     repeats = 1
     threads = 1
     try:
-        opts, args = getopt.gnu_getopt(argv[1:], 'hir:t:',['help','interactive','repeats=','threads='])
+        opts, args = getopt.gnu_getopt(
+            argv[1:], 'hir:t:', ['help', 'interactive',
+                                 'repeats=', 'threads='])
     except getopt.GetoptError:
         print(help_text)
         sys.exit()
     for opt, var in opts:
-        if opt in ('-h','--help'):
+        if opt in ('-h', '--help'):
             print(help_text)
             sys.exit()
-        elif opt in ('-i','--interactive'):
+        elif opt in ('-i', '--interactive'):
             Interactive.Input()
             sys.exit()
-        elif opt in ('-r','--repeats'):
+        elif opt in ('-r', '--repeats'):
             repeats = int(var)
-        elif opt in ('-t','--threads'):
+        elif opt in ('-t', '--threads'):
             threads = int(var)
         else:
             assert False
     if len(args) == 0:
         args.append(os.getcwd())
     for arg in args:
-        if not arg.endswith('/',-1):
+        if not arg.endswith('/', -1):
             arg = arg+'/'
         print("Running in "+arg)
         if not os.path.exists(arg):
@@ -83,11 +86,11 @@ def main(argv):
             sys.exit()
 
         bact = Bacteria()
-        bact.ConfigSweep_Parallel(config_dir,repeats,threads)
+        bact.ConfigSweep_Parallel(config_dir, repeats, threads)
         graph = Graphing(bact, graph_dir, plot_dir)
         graph.BrownianDiffusionConstants()
         graph.MotilityDiffusionConstants()
 
-if __name__== '__main__':
+
+if __name__ == '__main__':
     main(sys.argv)
-            

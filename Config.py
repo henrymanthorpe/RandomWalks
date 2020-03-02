@@ -26,7 +26,7 @@ shape = Sphere
 radius_sphere = 1e-6
 
 # Semi-Major and Semi-Minor axis radii (if Ellipsoid)
-radius_major = 
+radius_major =
 radius_minor =
 
 [env]
@@ -95,23 +95,22 @@ pause_mean =
 [seed]
 #RNG Variables
 
-# If a fixed seed is wanted to get repeatability, provide a entropy integer here
+# If a fixed seed is wanted to get repeatability,
+# provide an entropy integer here
 # Else, leave blank for normal use.
 entropy =
-    
+
     """
     fname = save_dir+"default_config.in"
-    f = open(fname,'w')
+    f = open(fname, 'w')
     f.write(default_config)
     f.close()
-    print("Default Config File created as 'default_config.in' in "+save_dir+" \n")
+    print("Default Config File created as 'default_config.in' in "
+          + save_dir + " \n")
     print("Please edit the contained values to those required for your needs.")
-    
-    
+
 
 def GetConfig(fname):
     config = configparser.ConfigParser(allow_no_value=True)
     config.read(fname)
     return config
-
-    
