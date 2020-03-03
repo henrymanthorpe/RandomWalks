@@ -83,7 +83,3 @@ def RotationalMotility(bacterium):
         results[i] = MSD_Rot(rotational_vect, tau_i,
                              bacterium.vars.sample_total)
     return results
-
-
-
-    

@@ -39,10 +39,12 @@ Exports
 def main(argv):
     repeats = 1
     threads = 1
+    save = False
     try:
         opts, args = getopt.gnu_getopt(
-            argv[1:], 'hir:t:', ['help', 'interactive',
-                                 'repeats=', 'threads='])
+            argv[1:], 'hir:t:s', ['help', 'interactive',
+                                  'repeats=', 'threads=',
+                                  'save'])
     except getopt.GetoptError:
         print(help_text)
         sys.exit()
@@ -57,6 +59,8 @@ def main(argv):
             repeats = int(var)
         elif opt in ('-t', '--threads'):
             threads = int(var)
+        elif opt in ('-s', '--save'):
+            save = True
         else:
             assert False
     if len(args) == 0:
@@ -81,6 +85,11 @@ def main(argv):
         if not os.path.exists(graph_dir):
             os.mkdir(graph_dir)
             print("Graph Directory not found, making "+graph_dir)
+        traj_dir = arg+'trajectories/'
+        if not os.path.exists(traj_dir) and save is True:
+            os.mkdir(traj_dir)
+            print("Trajectory Directory not found, making "+traj_dir)
+
         if len(os.listdir(config_dir)) == 0:
             Default(config_dir)
             sys.exit()
@@ -88,7 +97,6 @@ def main(argv):
         bact = Bacteria()
         bact.ConfigSweep_Parallel(config_dir, repeats, threads)
         graph = Graphing(bact, graph_dir, plot_dir)
-        graph.BrownianDiffusionConstants()
         graph.MotilityDiffusionConstants()
 
 

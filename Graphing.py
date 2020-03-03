@@ -242,12 +242,21 @@ class Graphing:
         g_title = '"Linear Regression of Mean Squared Displacement"'
         gp.c('set title ' + g_title)
         for key in self.bacteria.bacterium.keys():
+            tau = Analysis.TauCalc(self.bacteria.bacterium[key]['bact0'])
             x = self.results[key+'linear'][1]
             y = self.results[key+'linear'][0]
             weight = self.results[key+'linear'][2]
-            self.fit_linear[key], self.stats_linear[key]\
+            run_duration\
+                = self.bacteria.bacterium[key]['bact0'].vars.run_duration_mean
+            tau_split = np.searchsorted(tau, run_duration, 'left')
+            self.fit_linear[key+'low'], self.stats_linear[key+'low']\
                 = np.polynomial.polynomial.polyfit(
-                    x, y, 1, full=True, w=1/weight)
+                    x[:tau_split], y[:tau_split], 1,
+                    full=True, w=1/weight[:tau_split])
+            self.fit_linear[key+'high'], self.stats_linear[key+'high']\
+                = np.polynomial.polynomial.polyfit(
+                    x[tau_split:], y[tau_split:], 1,
+                    full=True, w=1/weight[tau_split:])
             gp.c('set output "'+self.graph_dir+key+'_motility_linear_fit.png"')
             plot_string = 'plot'
             gp.c('set xrange ['+str(x.min()*0.75)+':'+str(x.max()*1.5)+']')
@@ -257,8 +266,10 @@ class Graphing:
             plot_string = plot_string + ' "' + dat_name\
                 + '" u 1:2:3 with yerrorbars'\
                 + ' title "Mean Averaged MSD w/Standard Errors",'
-            gp.c('a = '+str(self.fit_linear[key][0]))
-            gp.c('b = '+str(self.fit_linear[key][1]))
-            gp.c('f(x) = b*x')
-            plot_string = plot_string + ' f(x) title "Linear Regression Fit"'
+            gp.c('a = '+str(self.fit_linear[key+'low'][1]))
+            gp.c('f(x) = a*x')
+            plot_string = plot_string + ' f(x) title "Low = '+str(self.fit_linear[key+'low'][1])+'",'
+            gp.c('b = '+str(self.fit_linear[key+'high'][1]))
+            gp.c('g(x) = b*x')
+            plot_string = plot_string + ' g(x) title "High = '+str(self.fit_linear[key+'high'][1])+'"'
             gp.c(plot_string)

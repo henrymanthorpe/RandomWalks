@@ -9,6 +9,7 @@ Created on Mon Feb 17 16:12:45 2020
 import numpy as np
 import quaternion
 from Input import Variables
+from TumbleDistribution import Fit
 from numpy.random import Generator, PCG64, SeedSequence
 
 
@@ -61,6 +62,7 @@ class Bacterium:
         self.rand_gen = Generator(PCG64(self.seed))
         self.vector_initial = np.array([1, 0, 0])
         self.pos_initial = np.array([0, 0, 0])
+        self.tumble_func = Fit(4)
 
     def ReSeed(self, entropy):
         self.seed = SeedSequence(entropy)
@@ -79,7 +81,7 @@ class Bacterium:
             0.0, self.std_dev_rotational, (2, self.vars.sample_total))
         self.diffusion_sample = np.sqrt(np.square(self.rotational_sample[0])
                                         + np.square(self.rotational_sample[1]))
-        self.spin_sample = np.random.random(self.vars.sample_total)*2*pi
+        self.spin_sample = self.rand_gen.random(self.vars.sample_total)*2*pi
         self.vectors_cartesian_diffusion\
             = np.zeros((self.vars.sample_total, 3))
         self.vectors_cartesian_diffusion[0] = Tumble(self.diffusion_sample[0],
@@ -171,10 +173,12 @@ class Bacterium:
                                 self.spin_sample[i],
                                 self.vectors_cartesian[i])
                         self.elapsed_time += current_tumble_length
-                        tumble_spin = np.random.random()*2*pi
+                        tumble_spin = self.rand_gen.random()*2*pi
+                        tumble_disp = self.tumble_func(
+                                            self.rand_gen.random())
                         j = self.elapsed_time
                         self.vectors_cartesian[j] = Tumble(
-                            self.vars.tumble_angle_mean,
+                            tumble_disp,
                             tumble_spin,
                             self.vectors_cartesian[j])
                         self.run_tumble_log['tumble'+str(q)]\
