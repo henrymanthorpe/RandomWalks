@@ -6,7 +6,7 @@ Created on Tue Feb 18 13:12:28 2020
 @author: henry
 """
 
-from Run import Bacteria
+import os
 import Analysis
 import numpy as np
 import PyGnuplot as gp
@@ -29,13 +29,15 @@ class Graphing:
         gp.c("set view equal xyz")
         gp.c("set terminal pngcairo enhanced size 1600,1200 font 'ariel, 14'")
         for key in self.bacteria.bacterium.keys():
-            gp.c('set output "'+self.graph_dir+key+'_path.png"')
+            output = os.path.join(self.graph_dir, key+'_path.png')
+            gp.c('set output "'+output+'"')
             plot_string = 'splot'
             for bact in self.bacteria.bacterium[key].keys():
                 temp_out = self.bacteria.bacterium[
                     key][bact].total_displacement
                 graph_out = np.swapaxes(temp_out, 0, 1)
-                dat_name = self.plot_dir+str(key)+str(bact)+'path.dat'
+                dat_name = os.path.join(self.plot_dir,
+                                        str(key)+str(bact)+'path.dat')
                 gp.s(graph_out, dat_name)
                 plot_string = plot_string + ' "' + dat_name\
                     + '" u 1:2:3 with lines,'
@@ -47,12 +49,14 @@ class Graphing:
         gp.c("set view equal xyz")
         gp.c("set terminal pngcairo enhanced size 1600,1200 font 'ariel, 14'")
         for key in self.bacteria.bacterium.keys():
-            gp.c('set output "'+self.graph_dir+key+'_heading.png"')
+            output = os.path.join(self.graph_dir, key+'_heading.png')
+            gp.c('set output "'+output+'"')
             plot_string = 'splot'
             for bact in self.bacteria.bacterium[key].keys():
                 temp_out = self.bacteria.bacterium[key][bact].vectors_cartesian
                 graph_out = np.swapaxes(temp_out, 0, 1)
-                dat_name = self.plot_dir+str(key)+str(bact)+'heading.dat'
+                dat_name = os.path.join(self.plot_dir,
+                                        str(key)+str(bact)+'heading.dat')
                 gp.s(graph_out, dat_name)
                 plot_string = plot_string + ' "' + dat_name\
                     + '" u 1:2:3 with lines,'
@@ -68,7 +72,8 @@ class Graphing:
         gp.c('set title ' + g_title)
         gp.c("set terminal pngcairo enhanced size 1600,1200 font 'ariel, 14'")
         for key in self.bacteria.bacterium.keys():
-            gp.c('set output "'+self.graph_dir+key+'_brownian_linear.png"')
+            output = os.path.join(self.graph_dir, key+'brownian_linear.png')
+            gp.c('set output "'+output+'"')
             plot_string = 'plot'
             tau = Analysis.TauCalc(self.bacteria.bacterium[key]['bact0'])
             p = len(tau)
@@ -80,7 +85,8 @@ class Graphing:
                     self.bacteria.bacterium[key][bact])
                 results_array[i] = graph_out
                 graph_out = np.vstack((graph_out, tau))
-                dat_name = self.plot_dir + str(key) + str(bact) + 'msd_lin.dat'
+                dat_name = os.path.join(self.plot_dir,
+                                        key + bact + '_br_msd_lin.dat')
                 gp.s(graph_out, dat_name)
                 plot_string = plot_string + ' "' + dat_name\
                     + '" u 2:1 with points title "' + str(bact) + ' MSD",'
@@ -93,7 +99,8 @@ class Graphing:
                 std_error = np.ones(len(tau))
             self.results[key + 'linear_brownian'] = np.vstack(
                 (mean_results, tau, std_error))
-            dat_name = self.plot_dir+str(key)+'msd_lin_brownian_mean.dat'
+            dat_name = os.path.join(self.plot_dir,
+                                    key + bact + '_br_msd_lin_mean.dat')
             gp.s(self.results[key+'linear_brownian'], dat_name)
             plot_string = plot_string + ' "' + dat_name\
                 + '" u 2:1:3 with yerrorbars'\
@@ -116,7 +123,9 @@ class Graphing:
             + ' Mean Squared Displacement"'
         gp.c('set title ' + g_title)
         for key in self.bacteria.bacterium.keys():
-            gp.c('set output "'+self.graph_dir+key+'_brownian_rotational.png"')
+            output = os.path.join(self.graph_dir,
+                                  key+'brownian_rotational.png')
+            gp.c('set output "'+output+'"')
             plot_string = 'plot'
             tau = Analysis.TauCalc(self.bacteria.bacterium[key]['bact0'])
             p = len(tau)
@@ -128,7 +137,8 @@ class Graphing:
                     self.bacteria.bacterium[key][bact])
                 results_array[i] = graph_out
                 graph_out = np.vstack((graph_out, tau))
-                dat_name = self.plot_dir+str(key)+str(bact)+'msd_rot.dat'
+                dat_name = os.path.join(self.plot_dir,
+                                        key + bact + '_br_msd_rot.dat')
                 gp.s(graph_out, dat_name)
                 plot_string = plot_string + ' "' + dat_name\
                     + '" u 2:1 with points title "' + str(bact) + ' MSD",'
@@ -141,7 +151,8 @@ class Graphing:
                 std_error = np.ones(len(tau))
             self.results[key+'rotational_brownian'] = np.vstack(
                 (mean_results, tau, std_error))
-            dat_name = self.plot_dir+str(key)+'msd_rot_brownian_mean.dat'
+            dat_name = os.path.join(self.plot_dir,
+                                    key + bact + '_br_msd_rot_mean.dat')
             gp.s(self.results[key+'rotational_brownian'], dat_name)
             plot_string = plot_string + ' "' + dat_name\
                 + '" u 2:1:3 with yerrorbars'\
@@ -170,7 +181,8 @@ class Graphing:
         gp.c('set title ' + g_title)
         gp.c("set terminal pngcairo enhanced size 1600,1200 font 'ariel, 14'")
         for key in self.bacteria.bacterium.keys():
-            gp.c('set output "'+self.graph_dir+key+'_motility_linear.png"')
+            output = os.path.join(self.graph_dir, key+'_motility_linear.png')
+            gp.c('set output "'+output+'"')
             plot_string = 'plot'
             tau = Analysis.TauCalc(self.bacteria.bacterium[key]['bact0'])
             gp.c('set xrange ['+str(tau.min()*0.75)+':'+str(tau.max()*1.5)+']')
@@ -183,7 +195,8 @@ class Graphing:
                     self.bacteria.bacterium[key][bact])
                 results_array[i] = graph_out
                 graph_out = np.vstack((graph_out, tau))
-                dat_name = self.plot_dir+str(key)+str(bact)+'msd_lin.dat'
+                dat_name = os.path.join(self.plot_dir,
+                                        key + bact + '_mot_msd_lin.dat')
                 gp.s(graph_out, dat_name)
                 plot_string = plot_string + ' "' + dat_name\
                     + '" u 2:1 with points title "' + str(bact) + ' MSD",'
@@ -196,7 +209,8 @@ class Graphing:
                 std_error = np.ones(len(tau))
             self.results[key+'linear'] = np.vstack(
                 (mean_results, tau, std_error))
-            dat_name = self.plot_dir+str(key)+'msd_lin_mean.dat'
+            dat_name = os.path.join(self.plot_dir,
+                                    key + bact + '_mot_msd_lin_mean.dat')
             gp.s(self.results[key+'linear'], dat_name)
             plot_string = plot_string + ' "' + dat_name\
                 + '" u 2:1:3 with yerrorbars'\
@@ -206,7 +220,9 @@ class Graphing:
         g_title = '"Analysis of Rotational Motility Mean Squared Displacement"'
         gp.c('set title ' + g_title)
         for key in self.bacteria.bacterium.keys():
-            gp.c('set output "'+self.graph_dir+key+'_motility_rotational.png"')
+            output = os.path.join(self.graph_dir,
+                                  key+'_motility_rotational.png')
+            gp.c('set output "'+output+'"')
             plot_string = 'plot'
             tau = Analysis.TauCalc(self.bacteria.bacterium[key]['bact0'])
             gp.c('set xrange ['+str(tau.min()*0.75)+':'+str(tau.max()*1.5)+']')
@@ -219,7 +235,8 @@ class Graphing:
                     self.bacteria.bacterium[key][bact])
                 results_array[i] = graph_out
                 graph_out = np.vstack((graph_out, tau))
-                dat_name = self.plot_dir+str(key)+str(bact)+'msd_rot.dat'
+                dat_name = os.path.join(self.plot_dir,
+                                        key + bact + 'mot_msd_rot.dat')
                 gp.s(graph_out, dat_name)
                 plot_string = plot_string + ' "' + dat_name\
                     + '" u 2:1 with points title "' + str(bact) + 'MSD",'
@@ -232,7 +249,8 @@ class Graphing:
                 std_error = np.ones(len(tau))
             self.results[key+'rotational'] = np.vstack(
                 (mean_results, tau, std_error))
-            dat_name = self.plot_dir+str(key)+'msd_rot_mean.dat'
+            dat_name = os.path.join(self.plot_dir,
+                                    key + bact + '_mot_msd_rot_mean.dat')
             gp.s(self.results[key+'rotational'], dat_name)
             plot_string = plot_string + ' "' + dat_name\
                 + '" u 2:1:3 with yerrorbars'\
@@ -257,19 +275,24 @@ class Graphing:
                 = np.polynomial.polynomial.polyfit(
                     x[tau_split:], y[tau_split:], 1,
                     full=True, w=1/weight[tau_split:])
-            gp.c('set output "'+self.graph_dir+key+'_motility_linear_fit.png"')
+            output = os.path.join(self.graph_dir,
+                                  key+'_motility_linear_fit.png')
+            gp.c('set output "'+output+'"')
             plot_string = 'plot'
             gp.c('set xrange ['+str(x.min()*0.75)+':'+str(x.max()*1.5)+']')
             graph_out = np.vstack((x, y, weight))
-            dat_name = self.plot_dir+str(key)+'lin_fit.dat'
+            dat_name = os.path.join(self.plot_dir,
+                                    key + bact + '_mot_lin_fit.dat')
             gp.s(graph_out, dat_name)
             plot_string = plot_string + ' "' + dat_name\
                 + '" u 1:2:3 with yerrorbars'\
                 + ' title "Mean Averaged MSD w/Standard Errors",'
             gp.c('a = '+str(self.fit_linear[key+'low'][1]))
             gp.c('f(x) = a*x')
-            plot_string = plot_string + ' f(x) title "Low = '+str(self.fit_linear[key+'low'][1])+'",'
+            plot_string = plot_string + ' f(x) title "Low = '\
+                + str(self.fit_linear[key+'low'][1])+'",'
             gp.c('b = '+str(self.fit_linear[key+'high'][1]))
             gp.c('g(x) = b*x')
-            plot_string = plot_string + ' g(x) title "High = '+str(self.fit_linear[key+'high'][1])+'"'
+            plot_string = plot_string + ' g(x) title "High = '\
+                + str(self.fit_linear[key+'high'][1])+'"'
             gp.c(plot_string)

@@ -64,28 +64,26 @@ def main(argv):
         else:
             assert False
     if len(args) == 0:
-        args.append(os.getcwd())
+        args.append(os.path.relpath(os.getcwd()))
     for arg in args:
-        if not arg.endswith('/', -1):
-            arg = arg+'/'
         print("Running in "+arg)
         if not os.path.exists(arg):
             print("Error: No such directory exists.")
             print(help_text)
             sys.exit()
-        config_dir = arg+'configs/'
+        config_dir = os.path.join(arg, 'configs')
         if not os.path.exists(config_dir):
             os.mkdir(config_dir)
             print("Config Directory not found, making "+config_dir)
-        plot_dir = arg+'plots/'
+        plot_dir = os.path.join(arg, 'plots')
         if not os.path.exists(plot_dir):
             os.mkdir(plot_dir)
             print("Plot Directory not found, making "+plot_dir)
-        graph_dir = arg+'graphs/'
+        graph_dir = os.path.join(arg, 'graphs')
         if not os.path.exists(graph_dir):
             os.mkdir(graph_dir)
             print("Graph Directory not found, making "+graph_dir)
-        traj_dir = arg+'trajectories/'
+        traj_dir = os.path.join(arg, 'trajectories')
         if not os.path.exists(traj_dir) and save is True:
             os.mkdir(traj_dir)
             print("Trajectory Directory not found, making "+traj_dir)
