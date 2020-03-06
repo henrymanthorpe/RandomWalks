@@ -5,7 +5,7 @@ Created on Fri Feb 14 19:48:13 2020
 
 @author: henry
 """
-
+import os
 import configparser
 
 
@@ -92,6 +92,18 @@ pause_var =
 # Mean Pause Duration
 pause_mean =
 
+[chem]
+# Chemotactic Variables
+
+# Chemotactic Behaviour
+chemotactic = no
+
+# Chemotactic Style (linear/point)
+chemotactic_style =
+
+# Chemotactic Source (vector)
+chemotactic_source =
+
 [seed]
 #RNG Variables
 
@@ -101,7 +113,7 @@ pause_mean =
 entropy =
 
     """
-    fname = save_dir+"default_config.in"
+    fname = os.path.join(save_dir, 'default_config.in')
     f = open(fname, 'w')
     f.write(default_config)
     f.close()
