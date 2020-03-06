@@ -8,6 +8,7 @@ Created on Tue Feb 18 10:56:16 2020
 
 from Simulate import Bacterium
 import os
+import time
 
 try:
     from joblib import Parallel, delayed

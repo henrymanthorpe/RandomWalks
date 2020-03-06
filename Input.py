@@ -28,7 +28,7 @@ class Variables:
                   + 'to input variables in the console.')
         else:
             config = Config.GetConfig(fname)
-            if config.sections() == ['phys', 'env', 'time', 'bact', 'seed']:
+            if config.sections() == ['phys', 'env', 'time', 'bact','chem', 'seed']:
                 self.phys = config['phys']
                 self.env = config['env']
                 self.time = config['time']
