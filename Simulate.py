@@ -61,6 +61,10 @@ class Bacterium:
         self.rand_gen = Generator(PCG64(self.seed))
         self.vector_initial = np.array([1, 0, 0])
         self.pos_initial = np.array([0, 0, 0])
+        self.time = np.full(self.vars.sample_total, self.vars.base_time)
+        self.time = np.append([0], self.time)
+        self.time = np.cumsum(self.time)
+        self.time = np.reshape(self.time, (self.time.size,1))
 
     def ReSeed(self, entropy):
         self.seed = SeedSequence(entropy)

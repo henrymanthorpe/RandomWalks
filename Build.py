@@ -15,27 +15,6 @@ import time
 import numpy as np
 from Config import Default
 
-help_text = """ Build.py <directory> <-h/r/t --help/repeats/threads>
-Runs all configs in directory for given number of repeats in parallel.
-<directory> can either be given local to current working directory, or in
-absolute form.
-If left empty, runs in current working directory.
-Multiple directories can be given, seperated by spaces
-
-Imports
-<directory>/configs/ -> contains config files to use (*.in format)
-
-Exports
-<directory>/plots/ -> Saved .dat files for gnuplot renders
-<directory>/graphs/ -> Saved .emf graph output
-
---- Options ---
--h --help -> Shows this message
--r --repeats -> Number of repeats per config file (Default=1)
--t --threads -> Number of CPU threads to use for task (Default=1)
-
-"""
-
 
 def main(argv):
     parser = argparse.ArgumentParser(description='Run Bacterial Simulation')
@@ -81,22 +60,23 @@ def main(argv):
             sys.exit()
         start = time.time()
         batch = Bacteria()
-        batch.ConfigSweep_Parallel(config_dir, args.repeats, args.threads)
+        batch.ConfigSweep_Parallel(config_dir, traj_dir,
+                                   args.repeats, args.threads)
         end = time.time()
         print("Computation time for "+arg+" = "+str(end-start)+" s")
-        if args.export is True:
-            for key in batch.bacterium.keys():
-                for bact in batch.bacterium[key].keys():
-                    fname = key + '_' + bact + "_path.txt"
-                    export = os.path.join(traj_dir, fname)
-                    np.savetxt(export,
-                               batch.bacterium[key][bact].displacement)
-                    fname = key + '_' + bact + "_heading.txt"
-                    export = os.path.join(traj_dir, fname)
-                    np.savetxt(export,
-                               batch.bacterium[key][bact].vectors_cartesian)
-        graph = Graphing(batch, graph_dir, plot_dir)
-        graph.MotilityDiffusionConstants()
+        # if args.export is True:
+        #     for key in batch.bacterium.keys():
+        #         for bact in batch.bacterium[key].keys():
+        #             fname = key + '_' + bact + "_path.txt"
+        #             export = os.path.join(traj_dir, fname)
+        #             np.savetxt(export,
+        #                        batch.bacterium[key][bact].displacement)
+        #             fname = key + '_' + bact + "_heading.txt"
+        #             export = os.path.join(traj_dir, fname)
+        #             np.savetxt(export,
+        #                        batch.bacterium[key][bact].vectors_cartesian)
+        #  graph = Graphing(batch, graph_dir, plot_dir)
+        #  graph.MotilityDiffusionConstants()
 
 
 if __name__ == '__main__':

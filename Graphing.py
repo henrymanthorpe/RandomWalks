@@ -12,6 +12,8 @@ import numpy as np
 import PyGnuplot as gp
 
 
+
+
 class Graphing:
 
     def __init__(self, bacteria, graph_dir, plot_dir):
