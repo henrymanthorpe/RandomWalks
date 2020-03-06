@@ -11,6 +11,7 @@ from Graphing import Graphing
 import sys
 import argparse
 import os
+import time
 import numpy as np
 from Config import Default
 
@@ -78,9 +79,11 @@ def main(argv):
         if len(os.listdir(config_dir)) == 0:
             Default(config_dir)
             sys.exit()
-
+        start = time.time()
         batch = Bacteria()
         batch.ConfigSweep_Parallel(config_dir, args.repeats, args.threads)
+        end = time.time()
+        print("Computation time for "+arg+" = "+str(end-start)+" s")
         if args.export is True:
             for key in batch.bacterium.keys():
                 for bact in batch.bacterium[key].keys():
