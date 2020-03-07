@@ -28,7 +28,7 @@ def SingleRun(fname, bact, traj_dir):
     export = np.hstack(save_tup)
     txt_name = os.path.join(traj_dir, "%s_%s.txt" % (
         os.path.splitext(os.path.split(fname)[1])[0], bact))
-    np.savetxt(txt_name, export)
+    np.savetxt(txt_name, export, fmt='%+.5e',delimiter='\t')
     end = time.time()
     elapsed = end-start
     print("Finished\t Config: %s \t %s \tTime taken %d" % (
