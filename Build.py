@@ -22,10 +22,13 @@ def main(argv):
                         type=int, help='Number of HW threads to use')
     parser.add_argument('-r', '--repeats', dest='repeats', default=1,
                         type=int, help='Number of repeats per config')
-    parser.add_argument('-e', '--export', dest='export', action='store_true',
-                        help='Export trajectories to file')
     parser.add_argument('-i', '--import', dest='import', action='store_true',
                         help='Import previous trajectories and rerun analysis')
+    parser.add_argument('-a', '--append', dest='append', action='store_true',
+                        help='If True, writes additional values up to'
+                        + ' repeat value, \n If False, clears values and'
+                        + ' recaluates up to repeat value \n'
+                        + 'Only use append if config file is unchanged')
     parser.add_argument('batches', nargs='*',
                         help='Root Directory for batch files')
     args = parser.parse_args()
@@ -51,7 +54,7 @@ def main(argv):
             os.mkdir(graph_dir)
             print("Graph Directory not found, making "+graph_dir)
         traj_dir = os.path.join(arg, 'trajectories')
-        if not os.path.exists(traj_dir) and args.export is True:
+        if not os.path.exists(traj_dir):
             os.mkdir(traj_dir)
             print("Trajectory Directory not found, making "+traj_dir)
 
@@ -61,22 +64,9 @@ def main(argv):
         start = time.time()
         batch = Bacteria()
         batch.ConfigSweep_Parallel(config_dir, traj_dir,
-                                   args.repeats, args.threads)
+                                   args.repeats, args.threads, args.append)
         end = time.time()
         print("Computation time for "+arg+" = "+str(end-start)+" s")
-        # if args.export is True:
-        #     for key in batch.bacterium.keys():
-        #         for bact in batch.bacterium[key].keys():
-        #             fname = key + '_' + bact + "_path.txt"
-        #             export = os.path.join(traj_dir, fname)
-        #             np.savetxt(export,
-        #                        batch.bacterium[key][bact].displacement)
-        #             fname = key + '_' + bact + "_heading.txt"
-        #             export = os.path.join(traj_dir, fname)
-        #             np.savetxt(export,
-        #                        batch.bacterium[key][bact].vectors_cartesian)
-        #  graph = Graphing(batch, graph_dir, plot_dir)
-        #  graph.MotilityDiffusionConstants()
 
 
 if __name__ == '__main__':
