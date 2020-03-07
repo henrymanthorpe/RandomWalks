@@ -24,7 +24,7 @@ def SingleRun(fname, bact, traj_dir):
     bacterium = Bacterium(fname)
     bacterium.Complete()
     save_tup = (bacterium.time, bacterium.displacement,
-                bacterium.total_displacement, bacterium.vectors_cartesian)
+                bacterium.vectors_cartesian)
     export = np.hstack(save_tup)
     txt_name = os.path.join(traj_dir, "%s_%s.txt" % (
         os.path.splitext(os.path.split(fname)[1])[0], bact))
