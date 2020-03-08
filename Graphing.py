@@ -92,12 +92,12 @@ class Graphing:
                 gp.c('set xrange [%f:%f]' % (tau.min()*0.75, tau.max()*0.75))
                 results_array = parallel(delayed(
                     Analysis.Linear)(self.bacteria.bacterium[key][bact],
-                                    self.bacteria.config[key])
+                                     self.bacteria.config[key])
                     for bact in self.bacteria.bacterium[key].keys())
                 size = len(results_array)
                 dat_name = os.path.join(self.plot_dir,
                                         '%s_msd_lin.dat' % (key))
-                graph_out = np.swapaxes(np.vstack((tau, results_array)), 0, 1)
+                graph_out = np.vstack((tau, results_array))
                 gp.s(graph_out, dat_name)
                 title = ['notitle' for i in range(size)]
                 plot_string = Plot_stringing(size, dat_name,

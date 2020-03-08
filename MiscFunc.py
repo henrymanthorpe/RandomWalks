@@ -64,13 +64,7 @@ def TumbleAlignmentCheck(n, t):
     return vect_final
 
 
-def Plot_stringing(size, dat_name, formatting, title):
-    plot_string = 'plot'
-    for i in range(size):
-        plot_string = plot_string\
-            + ' "%s" u 1:%d %s %s,' % (dat_name, i+2, formatting,
-                                               title[i])
-    return plot_string
+
 
 def ChemotaxisTest(v, f):
     chem_value = v.mean()
