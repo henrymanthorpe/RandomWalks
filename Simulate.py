@@ -213,8 +213,10 @@ class Bacterium:
 
                 elif self.state == 'erratic':  # Pause Tumble Behaviour (rhodo)
                     q += 1
+                    if self.vars.tumble_duration_mean == 0:
+                        current_tumble_length = 0
 
-                    if self.vars.tumble_duration_variation is True:
+                    elif self.vars.tumble_duration_variation is True:
                         current_tumble_length\
                             = int(np.round(self.rand_gen.exponential(
                                 self.vars.tumble_length_mean)))
@@ -241,7 +243,7 @@ class Bacterium:
                         self.elapsed_time += current_tumble_length
                         end_vec = self.vectors_cartesian[self.elapsed_time]
                         self.run_run_cosines.append(np.dot(start_vec, end_vec))
-                        self.run_tumble_log['pause'+str(q)]\
+                        self.run_tumble_log['tumble'+str(q)]\
                             = current_tumble_length
                         self.state = 'run'
                     else:
@@ -251,14 +253,16 @@ class Bacterium:
                                 self.diffusion_sample[i],
                                 self.spin_sample[i],
                                 self.vectors_cartesian[i])
-                            self.run_tumble_log['pause'+str(q)]\
+                            self.run_tumble_log['tumble'+str(q)]\
                                 = self.vars.sample_total-self.elapsed_time
                         break
 
                 elif self.state == 'smooth':  # Pause Tumble Behaviour (rhodo)
                     q += 1
+                    if self.vars.tumble_duration_mean == 0:
+                        current_tumble_length = 0
 
-                    if self.vars.tumble_duration_variation is True:
+                    elif self.vars.tumble_duration_variation is True:
                         current_tumble_length\
                             = int(np.round(self.rand_gen.exponential(
                                 self.vars.tumble_length_mean)))
@@ -287,7 +291,7 @@ class Bacterium:
                                      self.vectors_cartesian[self.elapsed_time])
                         end_vec = self.vectors_cartesian[self.elapsed_time]
                         self.run_run_cosines.append(np.dot(start_vec, end_vec))
-                        self.run_tumble_log['pause'+str(q)]\
+                        self.run_tumble_log['tumble'+str(q)]\
                             = current_tumble_length
                         self.state = 'run'
                     else:
@@ -297,13 +301,16 @@ class Bacterium:
                                 self.diffusion_sample[i],
                                 self.spin_sample[i],
                                 self.vectors_cartesian[i])
-                            self.run_tumble_log['pause'+str(q)]\
+                            self.run_tumble_log['tumble'+str(q)]\
                                 = self.vars.sample_total-self.elapsed_time
                         break
                 elif self.state == 'pause':  # Pause Tumble Behaviour (rhodo)
                     q += 1
 
-                    if self.vars.tumble_duration_variation is True:
+                    if self.vars.tumble_duration_mean == 0:
+                        current_tumble_length = 0
+
+                    elif self.vars.tumble_duration_variation is True:
                         current_tumble_length\
                             = int(np.round(self.rand_gen.exponential(
                                 self.vars.tumble_length_mean)))

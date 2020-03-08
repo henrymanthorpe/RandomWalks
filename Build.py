@@ -12,7 +12,6 @@ import sys
 import argparse
 import os
 import time
-import numpy as np
 from Config import Default
 
 
@@ -25,11 +24,16 @@ def main(argv):
     parser.add_argument('-i', '--import', dest='importing',
                         action='store_true',
                         help='Import previous trajectories and rerun analysis')
+    parser.add_argument('-d', '--default', dest='default',
+                        action='store_true',
+                        help='Save Default config file to CWD')
+    parser.add_argument('-o', '--overwrite', dest='overwrite',
+                        action='store_true',
+                        help='Overwrite Mode: Clears previous results and'
+                        + ' resimulates all values.')
     parser.add_argument('-a', '--append', dest='append', action='store_true',
-                        help='If True, writes additional values up to'
-                        + ' repeat value, \n If False, clears values and'
-                        + ' recaluates up to repeat value. \n'
-                        + 'Only use append if config file is unchanged')
+                        help='Append Mode: Keeps previous results and'
+                        + 'simulates new values up to <repeats>')
     parser.add_argument('-g', '--graph', dest='graph', action='store_true',
                         help='Run analysis routine')
     parser.add_argument('-vis', '--visualisation', dest='vis',
@@ -39,9 +43,31 @@ def main(argv):
                         help='Root Directory for batch files')
     args = parser.parse_args()
     print(args)
+    mode = None
+    if args.default:
+        Default()
+        sys.exit()
     if len(args.batches) == 0:
         parser.parse_args(['-h'])
         sys.exit()
+    if not args.importing:
+        if args.append:
+            mode = True
+        elif args.overwrite:
+            mode = False
+        elif args.append and args.overwrite:
+            print("Error: Cannot run in both Overwrite and Append modes")
+            parser.parse_args(['-h'])
+            sys.exit()
+        elif not args.append and not args.overwrite:
+            print("Error: No mode Specified (Overwrite/Append) ")
+            parser.parse_args(['-h'])
+            sys.exit()
+    if args.importing:
+        if not args.graph and not args.visualisation:
+            print("Error: Importing data for no reason (graph/vis)")
+            parser.parse_args(['-h'])
+            sys.exit()
     for arg in args.batches:
         print("Running in "+arg)
         if not os.path.exists(arg):
@@ -70,6 +96,7 @@ def main(argv):
             print("Cosines Directory not found, making %s " % (cosine_dir))
 
         if len(os.listdir(config_dir)) == 0:
+            print("No config files found in %s" % (config_dir))
             Default(config_dir)
             sys.exit()
         start = time.time()
@@ -79,7 +106,7 @@ def main(argv):
             print('Import Complete for %s' % (arg))
         else:
             batch.ConfigSweep_Parallel(config_dir, traj_dir, cosine_dir,
-                                       args.repeats, args.threads, args.append)
+                                       args.repeats, args.threads, mode)
             end = time.time()
             print('Simulation complete for %s' % (arg))
             print("Computation time = %f s" % (end-start))
@@ -87,6 +114,9 @@ def main(argv):
         if args.graph:
             graph = Graphing(batch, graph_dir, plot_dir)
             graph.MotilityDiffusionConstants()
+
+        if args.vis:
+            pass
 
 
 if __name__ == '__main__':

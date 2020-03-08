@@ -6,7 +6,6 @@ Created on Fri Feb 14 22:04:35 2020
 @author: henry
 """
 import Config
-import Interactive
 import numpy as np
 from scipy import constants
 import sys
@@ -39,6 +38,11 @@ class Variables:
             self.particle_mass = self.phys.getfloat('mol_mass')/avo
             self.viscosity = self.env.getfloat('viscosity')
             self.temperature = self.env.getfloat('temp')
+            self.start_pos = self.phys.get('start_pos')
+            self.start_pos = np.array(self.start_pos.split(','),
+                                      dtype=float)
+            if self.start_pos.shape != (3,):
+                raise ValueError()
             if self.phys.get('shape') == 'Sphere':
                 self.radius = self.phys.getfloat('radius_sphere')
                 self.frictional_drag_linear = 6*pi*self.viscosity*self.radius
@@ -124,5 +128,7 @@ class Variables:
             self.chem_source = self.chem.get('chemotactic_source')
             self.chem_source = np.array(self.chem_source.split(','),
                                         dtype=float)
+            if self.chem_source.shape != (3,):
+                raise ValueError()
         except ValueError:
             sys.exit(1)

@@ -17,7 +17,7 @@ def Default(save_dir=''):
 # Bacteria Physical Variables
 
 # Molecular mass of bacteria strain (kg/mol)
-mol_mass = 10
+mol_mass = 15
 
 # Bacteria shape (Sphere or Ellipsoid)
 shape = Sphere
@@ -29,8 +29,13 @@ radius_sphere = 1e-6
 radius_major =
 radius_minor =
 
+# Start Position (m)
+start_pos = 0,0,0
+
 [env]
 # Environment Variables
+
+# Defaults are for water in Standard Conditions
 
 # System Temperature (K)
 temp = 297
@@ -38,22 +43,14 @@ temp = 297
 # Absolute Viscosity of the medium (kg/(m*s))
 viscosity = 8.9e-4
 
-# Externally applied Force (N)
-f_x = 0
-f_y = 0
-f_z = 0
-
-# Modeling Gravitational acceleration?
-gravity = no
-
 [time]
 # Simulation Variables
 
 # Total simulation time (s)
-sim_time = 20
+sim_time = 600
 
 # Interval (step) time (s)
-base_time = 1e-3
+base_time = 10e-3
 
 [bact]
 # Run-Tumble Variables
@@ -116,12 +113,16 @@ chemotactic_memory = 0.1
 entropy =
 
     """
-    fname = os.path.join(save_dir, 'defaultconfig.in')
+    if save_dir == '':
+        save_dir = 'Current Working Directory'
+        fname = 'defaultconfig.in'
+    else:
+        fname = os.path.join(save_dir, 'defaultconfig.in')
     f = open(fname, 'w')
     f.write(default_config)
     f.close()
-    print("Default Config File created as 'default_config.in' in "
-          + save_dir + " \n")
+    print("Default Config File created as 'defaultconfig.in' in %s"
+          % (save_dir))
     print("Please edit the contained values to those required for your needs.")
 
 

@@ -8,7 +8,7 @@ Created on Fri Mar  6 17:46:37 2020
 import os
 import numpy as np
 from numpy.random import Generator, PCG64, SeedSequence
-from Simulate import Normalise, MakeRotationQuaternion, Tumble
+from Simulate import Tumble
 import matplotlib.pyplot as plt
 from joblib import Parallel, delayed
 
@@ -62,3 +62,6 @@ def TumbleAlignmentCheck(n, t):
                                               vect_mid[i])
                               for i in range(n))
     return vect_final
+
+def ChemotaxisTest(v, f):
+    chem_value = v.mean()

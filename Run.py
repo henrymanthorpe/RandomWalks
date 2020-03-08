@@ -57,25 +57,25 @@ class Bacteria:
         self.bacterium = {}
         self.cosines = {}
 
-    def ConfigSweep(self, config_dir, repeats):
-        self.schedule_array = []
-        for entry in os.scandir(config_dir):
-            if entry.path.endswith('.in', -3):
-                self.config[os.path.splitext(os.path.split(entry.path)
-                                             [-1])[0]] = entry.path
-                self.bacterium[os.path.splitext(os.path.split(entry.path)
-                                                [-1])[0]] = {}
-                for i in range(repeats):
-                    self.schedule_array.append(['', '', ''])
-                    self.schedule_array[-1][0] = os.path.splitext(
-                        os.path.split(entry.path)[-1])[0]
-                    self.schedule_array[-1][1] = 'bact'+str(i)
-                    self.schedule_array[-1][2] = entry.path
-        out = [SingleRun(self.schedule_array[i][2])
-               for i in range(len(self.schedule_array))]
-        for i in range(len(self.schedule_array)):
-            self.bacterium[self.schedule_array[i][0]][
-                self.schedule_array[i][1]] = out[i]
+    # def ConfigSweep(self, config_dir, repeats):
+    #     self.schedule_array = []
+    #     for entry in os.scandir(config_dir):
+    #         if entry.path.endswith('.in', -3):
+    #             self.config[os.path.splitext(os.path.split(entry.path)
+    #                                          [-1])[0]] = entry.path
+    #             self.bacterium[os.path.splitext(os.path.split(entry.path)
+    #                                             [-1])[0]] = {}
+    #             for i in range(repeats):
+    #                 self.schedule_array.append(['', '', ''])
+    #                 self.schedule_array[-1][0] = os.path.splitext(
+    #                     os.path.split(entry.path)[-1])[0]
+    #                 self.schedule_array[-1][1] = 'bact'+str(i)
+    #                 self.schedule_array[-1][2] = entry.path
+    #     out = [SingleRun(self.schedule_array[i][2])
+    #            for i in range(len(self.schedule_array))]
+    #     for i in range(len(self.schedule_array)):
+    #         self.bacterium[self.schedule_array[i][0]][
+    #             self.schedule_array[i][1]] = out[i]
 
     def Import(self, config_dir, traj_dir, cosine_dir):
         for entry in os.scandir(config_dir):
@@ -136,5 +136,5 @@ class Bacteria:
             for i in range(len(self.schedule_array)):
                 self.bacterium[self.schedule_array[i][0]][
                     self.schedule_array[i][1]] = out[i][0]
-                self.consines[self.schedule_array[i][0]][
+                self.cosines[self.schedule_array[i][0]][
                     self.schedule_array[i][1]] = out[i][1]

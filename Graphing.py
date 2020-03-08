@@ -22,6 +22,8 @@ class Graphing:
         self.plots = {}
         self.graph_dir = graph_dir
         self.plot_dir = plot_dir
+        for entry in os.scandir(plot_dir):
+            os.remove(entry.path)
 
     def BacteriaPaths(self):
         gp.c("reset")
