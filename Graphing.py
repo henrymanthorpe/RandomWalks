@@ -116,7 +116,7 @@ class Graphing:
                                         '%s_msd_lin_mean.dat' % (key))
                 gp.s(self.results[key+'linear'], dat_name)
                 plot_string = 'plot "%s" u 1:2:3 with yerrorbars' % (dat_name)
-                plot_string = plot_string + 'title "Mean Linear MSD"'
+                plot_string = plot_string + ' title "Mean Linear MSD"'
                 gp.c(plot_string)
             # gp.c('set ylabel "MSD ({/Symbol q}^2)"')
             # g_title = '"Analysis of Rotational Motility Mean Squared Displacement"'
