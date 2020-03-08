@@ -194,7 +194,8 @@ class Graphing:
             i = 0
             for bact in self.bacteria.bacterium[key].keys():
                 graph_out = Analysis.Linear(
-                    self.bacteria.bacterium[key][bact])
+                    self.bacteria.bacterium[key][bact],
+                    self.bacteria.config[key])
                 results_array[i] = graph_out
                 graph_out = np.vstack((graph_out, tau))
                 dat_name = os.path.join(self.plot_dir,
@@ -234,7 +235,8 @@ class Graphing:
             i = 0
             for bact in self.bacteria.bacterium[key].keys():
                 graph_out = Analysis.Rotational(
-                    self.bacteria.bacterium[key][bact])
+                    self.bacteria.bacterium[key][bact],
+                    self.bacteria.config[key])
                 results_array[i] = graph_out
                 graph_out = np.vstack((graph_out, tau))
                 dat_name = os.path.join(self.plot_dir,
