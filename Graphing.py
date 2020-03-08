@@ -91,9 +91,9 @@ class Graphing:
                 tau = Analysis.TauCalc(self.bacteria.config[key])
                 gp.c('set xrange [%f:%f]' % (tau.min()*0.75, tau.max()*0.75))
                 results_array = parallel(delayed(
-                    Analysis.Linear(self.bacteria.bacterium[key][bact],
+                    Analysis.Linear)(self.bacteria.bacterium[key][bact],
                                     self.bacteria.config[key])
-                    for bact in self.bacteria.bacterium[key].keys()))
+                    for bact in self.bacteria.bacterium[key].keys())
                 size = len(results_array)
                 dat_name = os.path.join(self.plot_dir,
                                         '%s_msd_lin.dat' % (key))
