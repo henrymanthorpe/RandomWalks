@@ -19,7 +19,7 @@ def MakeBatch():
         os.mkdir(config_dir)
     elif not os.path.exists(config_dir):
         os.mkdir(config_dir)
-    base_config = input('Enter Filename of base config :')
+    base_config = input('Enter Filename of config file :')
     section, key = input('Enter section and key name :').split()
     config = GetConfig(base_config)
     start, stop, step_num = input('Enter start value, stop value, and number of steps :').split()
@@ -39,6 +39,5 @@ def MakeBatch():
             config.write(f)
             f.close()
 
-            
-                
-    
+
+

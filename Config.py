@@ -73,24 +73,21 @@ run_mean = 0.9
 #Tumble Behaviour
 tumble = yes
 
-# Varying Tumble Angle
-tumble_angle_var = yes
+#Tumble type - smooth, erratic, pause
+tumble_type = smooth
 
-# Mean Tumble angle (degrees)
-tumble_angle_mean = 70
+#Tumble Duration Variation
+tumble_duration_var =yes
 
-# Varying Tumble duration
-tumble_duration_var = yes
-
-# Mean Tumble duration (s)
+#Mean Tumble Duration (s)
 tumble_duration_mean = 0.1
 
-#(For No Tumbles - Rotation only by Diffusion)
-# Varying Pause Duration
-pause_var =
+# Mean Tumble Angular Velocity (degrees/sec)
+tumble_velocity = 650
 
-# Mean Pause Duration
-pause_mean =
+
+# Archaea mode - Run and Reverse
+archaea_mode = no
 
 [chem]
 # Chemotactic Variables
@@ -99,10 +96,16 @@ pause_mean =
 chemotactic = no
 
 # Chemotactic Style (linear/point)
-chemotactic_style =
+chemotactic_style = linear
 
-# Chemotactic Source (vector)
-chemotactic_source =
+# Chemotactic Axis/Source
+chemotactic_source = 0,0,1
+
+# Chemotactic Factor
+chemotactic_factor = 2
+
+# Chemotactic Memory (s)
+chemotactic_memory = 0.1
 
 [seed]
 #RNG Variables
@@ -113,7 +116,7 @@ chemotactic_source =
 entropy =
 
     """
-    fname = os.path.join(save_dir, 'default_config.in')
+    fname = os.path.join(save_dir, 'defaultconfig.in')
     f = open(fname, 'w')
     f.write(default_config)
     f.close()

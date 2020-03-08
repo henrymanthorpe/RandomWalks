@@ -12,8 +12,6 @@ import numpy as np
 import PyGnuplot as gp
 
 
-
-
 class Graphing:
 
     def __init__(self, bacteria, graph_dir, plot_dir):
@@ -77,7 +75,7 @@ class Graphing:
             output = os.path.join(self.graph_dir, key+'brownian_linear.png')
             gp.c('set output "'+output+'"')
             plot_string = 'plot'
-            tau = Analysis.TauCalc(self.bacteria.bacterium[key]['bact0'])
+            tau = Analysis.TauCalc(self.bacteria.config[key])
             p = len(tau)
             q = len(self.bacteria.bacterium[key])
             results_array = np.zeros((q, p))
@@ -129,7 +127,7 @@ class Graphing:
                                   key+'brownian_rotational.png')
             gp.c('set output "'+output+'"')
             plot_string = 'plot'
-            tau = Analysis.TauCalc(self.bacteria.bacterium[key]['bact0'])
+            tau = Analysis.TauCalc(self.bacteria.config[key])
             p = len(tau)
             q = len(self.bacteria.bacterium[key])
             results_array = np.zeros((q, p))
@@ -186,14 +184,14 @@ class Graphing:
             output = os.path.join(self.graph_dir, key+'_motility_linear.png')
             gp.c('set output "'+output+'"')
             plot_string = 'plot'
-            tau = Analysis.TauCalc(self.bacteria.bacterium[key]['bact0'])
+            tau = Analysis.TauCalc(self.bacteria.config[key])
             gp.c('set xrange ['+str(tau.min()*0.75)+':'+str(tau.max()*1.5)+']')
             p = len(tau)
             q = len(self.bacteria.bacterium[key])
             results_array = np.zeros((q, p))
             i = 0
             for bact in self.bacteria.bacterium[key].keys():
-                graph_out = Analysis.LinearMotility(
+                graph_out = Analysis.Linear(
                     self.bacteria.bacterium[key][bact])
                 results_array[i] = graph_out
                 graph_out = np.vstack((graph_out, tau))
@@ -226,14 +224,14 @@ class Graphing:
                                   key+'_motility_rotational.png')
             gp.c('set output "'+output+'"')
             plot_string = 'plot'
-            tau = Analysis.TauCalc(self.bacteria.bacterium[key]['bact0'])
+            tau = Analysis.TauCalc(self.bacteria.config[key])
             gp.c('set xrange ['+str(tau.min()*0.75)+':'+str(tau.max()*1.5)+']')
             p = len(tau)
             q = len(self.bacteria.bacterium[key])
             results_array = np.zeros((q, p))
             i = 0
             for bact in self.bacteria.bacterium[key].keys():
-                graph_out = Analysis.RotationalMotility(
+                graph_out = Analysis.Rotational(
                     self.bacteria.bacterium[key][bact])
                 results_array[i] = graph_out
                 graph_out = np.vstack((graph_out, tau))
@@ -262,12 +260,12 @@ class Graphing:
         g_title = '"Linear Regression of Mean Squared Displacement"'
         gp.c('set title ' + g_title)
         for key in self.bacteria.bacterium.keys():
-            tau = Analysis.TauCalc(self.bacteria.bacterium[key]['bact0'])
+            tau = Analysis.TauCalc(self.bacteria.config[key])
             x = self.results[key+'linear'][1]
             y = self.results[key+'linear'][0]
             weight = self.results[key+'linear'][2]
             run_duration\
-                = self.bacteria.bacterium[key]['bact0'].vars.run_duration_mean
+                = self.bacteria.config[key].run_duration_mean
             tau_split = np.searchsorted(tau, run_duration, 'left')
             self.fit_linear[key+'low'], self.stats_linear[key+'low']\
                 = np.polynomial.polynomial.polyfit(
