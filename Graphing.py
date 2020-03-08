@@ -83,7 +83,8 @@ class Graphing:
             gp.c('set key top left')
             g_title = '"Analysis of Linear Mean Squared Displacement"'
             gp.c('set title ' + g_title)
-            gp.c("set terminal pngcairo enhanced size 1600,1200 font 'ariel, 14'")
+            gp.c("set terminal pngcairo enhanced"
+                 + " size 1600,1200 font 'ariel, 14'")
             for key in self.bacteria.bacterium.keys():
                 output = os.path.join(self.graph_dir,
                                       '%s_linear.png' % (key))
@@ -102,15 +103,20 @@ class Graphing:
                 title = ['notitle' for i in range(size)]
                 plot_string = Plot_stringing(size, dat_name,
                                              'with points', title)
+                gp.c(plot_string)
+                output = os.path.join(self.graph_dir,
+                                      '%s_linear_mean.png' % (key))
+                gp.c('set output "%s"' % (output))
                 mean_results = np.mean(results_array, axis=0)
+                std_dev = np.std(results_array, axis=0)
+                std_error = std_dev/np.sqrt(size)
                 self.results[key+'linear'] = np.vstack(
-                    (mean_results, tau))
+                    (tau, mean_results, std_error))
                 dat_name = os.path.join(self.plot_dir,
                                         '%s_msd_lin_mean.dat' % (key))
                 gp.s(self.results[key+'linear'], dat_name)
-                plot_string = plot_string + ' "' + dat_name\
-                    + '" u 2:1:3 with yerrorbars'\
-                    + ' title "Mean Averaged MSD w/Standard Errors",'
+                plot_string = 'plot "%s" u 1:2:3 with yerrorbars' % (dat_name)
+                plot_string = plot_string + 'title "Mean Linear MSD"'
                 gp.c(plot_string)
             # gp.c('set ylabel "MSD ({/Symbol q}^2)"')
             # g_title = '"Analysis of Rotational Motility Mean Squared Displacement"'
