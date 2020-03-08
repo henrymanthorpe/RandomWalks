@@ -13,10 +13,11 @@ def LoadValues(fname, request):
     values = np.delete(values, 0, 0)
     values = np.swapaxes(values, 0, 1)
     if request == 'displacement':
-        return values[1:4]
+        return np.swapaxes(values[1:4], 0, 1)
     elif request == 'heading':
-        return values[4:7]
-
+        return np.swapaxes(values[4:7], 0, 1)
+    else:
+        return values
 
 def TauCalc(variables):
     sample_total = int(np.floor(np.log2(variables.sim_time
