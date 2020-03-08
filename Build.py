@@ -112,8 +112,8 @@ def main(argv):
             print("Computation time = %f s" % (end-start))
 
         if args.graph:
-            graph = Graphing(batch, graph_dir, plot_dir)
-            graph.MotilityDiffusionConstants()
+            graph = Graphing(batch, graph_dir, plot_dir, args.threads)
+            graph.DiffusionConstants()
 
         if args.vis:
             pass
