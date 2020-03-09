@@ -19,6 +19,12 @@ def LoadValues(fname, request):
     else:
         return values
 
+
+def LoadCosines(fname):
+    values = np.loadtxt(fname, delimiter='\t')
+    return values
+
+
 def TauCalc(variables):
     sample_total = int(np.floor(np.log2(variables.sim_time
                                         / variables.base_time)))
@@ -75,33 +81,7 @@ def Rotational(bacterium, variables):
     return results
 
 
-        # graph_out = Analysis.LinearDiffusion(
-        # self.bacteria.bacterium[key][bact])
-        # results_array[i] = graph_out
-        # graph_out = np.vstack((graph_out, tau))
-        # dat_name = os.path.join(self.plot_dir,
-        #                         key + bact + '_br_msd_lin.dat')
-        # gp.s(graph_out, dat_name)
-        # plot_string = plot_string + ' "' + dat_name\
-        #     + '" u 2:1 with points title "' + str(bact) + ' MSD",'
-        #         i = i + 1
-
-# def LinearMotility(bacterium):
-#     linear = bacterium.displacement
-#     tau = TauCalc(bacterium)
-#     results = np.zeros(len(tau))
-#     for i in range(len(tau)):
-#         tau_i = int(np.round(tau[i]/bacterium.vars.base_time))
-#         results[i] = MSD(linear, tau_i, bacterium.vars.sample_total)
-#     return results
-
-
-# def RotationalMotility(bacterium):
-#     rotational_vect = bacterium.vectors_cartesian
-#     tau = TauCalc(bacterium)
-#     results = np.zeros(len(tau))
-#     for i in range(len(tau)):
-#         tau_i = int(np.round(tau[i]/bacterium.vars.base_time))
-#         results[i] = MSD_Rot(rotational_vect, tau_i,
-#                              bacterium.vars.sample_total)
-#     return results
+def RunRunAngles(cosines):
+    cosine_array = LoadCosines(cosines)
+    angle_array = np.arccos(cosine_array)
+    return angle_array

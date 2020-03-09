@@ -13,6 +13,7 @@ import argparse
 import os
 import time
 from Config import Default
+from Visify import VisifyExport
 
 
 def main(argv):
@@ -94,17 +95,21 @@ def main(argv):
         if not os.path.exists(cosine_dir):
             os.mkdir(cosine_dir)
             print("Cosines Directory not found, making %s " % (cosine_dir))
+        vis_dir = os.path.join(arg, 'visualisation')
+        if not os.path.exists(vis_dir):
+            os.mkdir(vis_dir)
+            print("Cosines Directory not found, making %s " % (vis_dir))
 
         if len(os.listdir(config_dir)) == 0:
             print("No config files found in %s" % (config_dir))
             Default(config_dir)
             sys.exit()
-        start = time.time()
         batch = Bacteria()
         if args.importing:
             batch.Import(config_dir, traj_dir, cosine_dir)
             print('Import Complete for %s' % (arg))
         else:
+            start = time.time()
             batch.ConfigSweep_Parallel(config_dir, traj_dir, cosine_dir,
                                        args.repeats, args.threads, mode)
             end = time.time()
@@ -112,11 +117,20 @@ def main(argv):
             print("Computation time = %f s" % (end-start))
 
         if args.graph:
+            start = time.time()
             graph = Graphing(batch, graph_dir, plot_dir, args.threads)
             graph.DiffusionConstants()
-
+            end = time.time()
+            print('Analysis Complete for %s' % (arg))
+            print('Computation time = %f s' % (end-start))
         if args.vis:
-            pass
+            start = time.time()
+            VisifyExport(batch, vis_dir, args.threads)
+            end = time.time()
+            print('Export complete for %s' % (arg))
+            print('Computation time = %f s' % (end-start))
+
+    return
 
 
 if __name__ == '__main__':

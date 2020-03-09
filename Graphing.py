@@ -13,11 +13,19 @@ import PyGnuplot as gp
 from joblib import Parallel, delayed
 
 
-def Plot_stringing(size, dat_name, formatting, title):
+def plotStringSingleFile(size, dat_name, formatting, title):
     plot_string = 'plot'
     for i in range(size):
         plot_string = plot_string\
             + ' "%s" u 1:%d %s %s,' % (dat_name, i+2, formatting, title[i])
+    return plot_string
+
+
+def plotStringMultiFile(size, dat_name, formatting, title):
+    plot_string = 'plot'
+    for i in range(size):
+        plot_string = plot_string\
+            + ' "%s" u 1:2:3 %s %s,' % (dat_name[i], formatting, title[i])
     return plot_string
 
 
@@ -81,14 +89,16 @@ class Graphing:
             gp.c('set xlabel "{/Symbol t} (s)"')
             gp.c('set ylabel "MSD (m^2)"')
             gp.c('set key top left')
-            g_title = '"Analysis of Linear Mean Squared Displacement"'
-            gp.c('set title ' + g_title)
             gp.c("set terminal pngcairo enhanced"
                  + " size 1600,1200 font 'ariel, 14'")
+            mega_plot_string = 'plot'
             for key in self.bacteria.bacterium.keys():
                 output = os.path.join(self.graph_dir,
                                       '%s_linear.png' % (key))
                 gp.c('set output "%s"' % (output))
+                g_title = 'Analysis of Linear Mean Squared Displacement %s'\
+                    % (key)
+                gp.c('set title "%s"' % (g_title))
                 tau = Analysis.TauCalc(self.bacteria.config[key])
                 gp.c('set xrange [%f:%f]' % (tau.min()*0.75, tau.max()*0.75))
                 results_array = parallel(delayed(
@@ -101,8 +111,8 @@ class Graphing:
                 graph_out = np.vstack((tau, results_array))
                 gp.s(graph_out, dat_name)
                 title = ['notitle' for i in range(size)]
-                plot_string = Plot_stringing(size, dat_name,
-                                             'with points', title)
+                plot_string = plotStringSingleFile(size, dat_name,
+                                                   'with points', title)
                 gp.c(plot_string)
                 output = os.path.join(self.graph_dir,
                                       '%s_linear_mean.png' % (key))
@@ -118,84 +128,89 @@ class Graphing:
                 plot_string = 'plot "%s" u 1:2:3 with yerrorbars' % (dat_name)
                 plot_string = plot_string + ' title "Mean Linear MSD"'
                 gp.c(plot_string)
-            # gp.c('set ylabel "MSD ({/Symbol q}^2)"')
-            # g_title = '"Analysis of Rotational Motility Mean Squared Displacement"'
-            # gp.c('set title ' + g_title)
-            # for key in self.bacteria.bacterium.keys():
-            #     output = os.path.join(self.graph_dir,
-            #                           key+'_motility_rotational.png')
-            #     gp.c('set output "'+output+'"')
-            #     plot_string = 'plot'
-            #     tau = Analysis.TauCalc(self.bacteria.config[key])
-            #     gp.c('set xrange ['+str(tau.min()*0.75)+':'+str(tau.max()*1.5)+']')
-            #     p = len(tau)
-            #     q = len(self.bacteria.bacterium[key])
-            #     results_array = np.zeros((q, p))
-            #     i = 0
-            #     for bact in self.bacteria.bacterium[key].keys():
-            #         graph_out = Analysis.Rotational(
-            #             self.bacteria.bacterium[key][bact],
-            #             self.bacteria.config[key])
-            #         results_array[i] = graph_out
-            #         graph_out = np.vstack((graph_out, tau))
-            #         dat_name = os.path.join(self.plot_dir,
-            #                                 key + bact + 'mot_msd_rot.dat')
-            #         gp.s(graph_out, dat_name)
-            #         plot_string = plot_string + ' "' + dat_name\
-            #             + '" u 2:1 with points title "' + str(bact) + 'MSD",'
-            #         i = i + 1
-            #     mean_results = np.mean(results_array, axis=0)
-            #     if q > 1:
-            #         std_dev = np.std(results_array, axis=0)
-            #         std_error = std_dev/np.sqrt(q)
-            #     else:
-            #         std_error = np.ones(len(tau))
-            #     self.results[key+'rotational'] = np.vstack(
-            #         (mean_results, tau, std_error))
-            #     dat_name = os.path.join(self.plot_dir,
-            #                             key + bact + '_mot_msd_rot_mean.dat')
-            #     gp.s(self.results[key+'rotational'], dat_name)
-            #     plot_string = plot_string + ' "' + dat_name\
-            #         + '" u 2:1:3 with yerrorbars'\
-            #         + ' title "Mean Averaged MSD w/Standard Errors",'
-            #     gp.c(plot_string)
-            # gp.c('set ylabel "MSD (m^2)')
-            # g_title = '"Linear Regression of Mean Squared Displacement"'
-            # gp.c('set title ' + g_title)
-            # for key in self.bacteria.bacterium.keys():
-            #     tau = Analysis.TauCalc(self.bacteria.config[key])
-            #     x = self.results[key+'linear'][1]
-            #     y = self.results[key+'linear'][0]
-            #     weight = self.results[key+'linear'][2]
-            #     run_duration\
-            #         = self.bacteria.config[key].run_duration_mean
-            #     tau_split = np.searchsorted(tau, run_duration, 'left')
-            #     self.fit_linear[key+'low'], self.stats_linear[key+'low']\
-            #         = np.polynomial.polynomial.polyfit(
-            #             x[:tau_split], y[:tau_split], 1,
-            #             full=True, w=1/weight[:tau_split])
-            #     self.fit_linear[key+'high'], self.stats_linear[key+'high']\
-            #         = np.polynomial.polynomial.polyfit(
-            #             x[tau_split:], y[tau_split:], 1,
-            #             full=True, w=1/weight[tau_split:])
-            #     output = os.path.join(self.graph_dir,
-            #                           key+'_motility_linear_fit.png')
-            #     gp.c('set output "'+output+'"')
-            #     plot_string = 'plot'
-            #     gp.c('set xrange ['+str(x.min()*0.75)+':'+str(x.max()*1.5)+']')
-            #     graph_out = np.vstack((x, y, weight))
-            #     dat_name = os.path.join(self.plot_dir,
-            #                             key + bact + '_mot_lin_fit.dat')
-            #     gp.s(graph_out, dat_name)
-            #     plot_string = plot_string + ' "' + dat_name\
-            #         + '" u 1:2:3 with yerrorbars'\
-            #         + ' title "Mean Averaged MSD w/Standard Errors",'
-            #     gp.c('a = '+str(self.fit_linear[key+'low'][1]))
-            #     gp.c('f(x) = a*x')
-            #     plot_string = plot_string + ' f(x) title "Low = '\
-            #         + str(self.fit_linear[key+'low'][1])+'",'
-            #     gp.c('b = '+str(self.fit_linear[key+'high'][1]))
-            #     gp.c('g(x) = b*x')
-            #     plot_string = plot_string + ' g(x) title "High = '\
-            #         + str(self.fit_linear[key+'high'][1])+'"'
-            #     gp.c(plot_string)
+                mega_plot_string = mega_plot_string\
+                    + ' "%s" u 1:2:3 with yerrorbars title "%s"' % (dat_name,
+                                                                    key)
+            output = os.path.join(self.graph_dir, 'linear_mean_amalg.png')
+            g_title = 'Analysis of Linear Mean Squared Displacement'
+            gp.c('set title "%s"' % (g_title))
+            gp.c('set xrange [*:*]')
+            gp.c(mega_plot_string)
+
+            mega_plot_string = 'plot'
+            for key in self.bacteria.bacterium.keys():
+                output = os.path.join(self.graph_dir,
+                                      '%s_rotational.png' % (key))
+                gp.c('set output "%s"' % (output))
+                title = 'Analysis of Rotational Mean Squared Displacement - %s'\
+                    % (key)
+                gp.c('set title "%s"' % (title))
+                tau = Analysis.TauCalc(self.bacteria.config[key])
+                gp.c('set xrange [%f:%f]' % (tau.min()*0.75, tau.max()*0.75))
+                results_array = parallel(delayed(
+                    Analysis.Rotational)(self.bacteria.bacterium[key][bact],
+                                         self.bacteria.config[key])
+                    for bact in self.bacteria.bacterium[key].keys())
+                size = len(results_array)
+                dat_name = os.path.join(self.plot_dir,
+                                        '%s_msd_rot.dat' % (key))
+                graph_out = np.vstack((tau, results_array))
+                gp.s(graph_out, dat_name)
+                title = ['notitle' for i in range(size)]
+                plot_string = plotStringSingleFile(size, dat_name,
+                                                   'with points', title)
+                gp.c(plot_string)
+                output = os.path.join(self.graph_dir,
+                                      '%s_rotational_mean.png' % (key))
+                gp.c('set output "%s"' % (output))
+                mean_results = np.mean(results_array, axis=0)
+                std_dev = np.std(results_array, axis=0)
+                std_error = std_dev/np.sqrt(size)
+                self.results[key+'rotational'] = np.vstack(
+                    (tau, mean_results, std_error))
+                dat_name = os.path.join(self.plot_dir,
+                                        '%s_msd_rot_mean.dat' % (key))
+                gp.s(self.results[key+'rotational'], dat_name)
+                plot_string = 'plot "%s" u 1:2:3 with yerrorbars' % (dat_name)
+                plot_string = plot_string + ' title "Mean Rotational MSD"'
+                gp.c(plot_string)
+                mega_plot_string = mega_plot_string\
+                    + ' "%s" u 1:2:3 with yerrorbars title "%s"' % (dat_name,
+                                                                    key)
+            output = os.path.join(self.graph_dir, 'rotational_mean_amalg.png')
+            g_title = 'Analysis of Rotational Mean Squared Displacement'
+            gp.c('set title "%s"' % (g_title))
+            gp.c('set xrange [*:*]')
+            gp.c(mega_plot_string)
+            mega_plot_string = 'plot'
+            gp.c('unset logscale')
+            gp.c('set xlabel "Counts"')
+            gp.c('set ylabel "Run to Run Angle (degrees)"')
+            for key in self.bacteria.bacterium.keys():
+                output = os.path.join(self.graph_dir,
+                                      '%s_run_run_angle.png' % (key))
+                gp.c('set output "%s"' % (output))
+                title = 'Analysis of Run to Run Angle - %s'\
+                    % (key)
+                gp.c('set title "%s"' % (title))
+                angle_list = parallel(delayed(Analysis.RunRunAngles)
+                                      (self.bacteria.cosines[key][bact])
+                                      for bact in
+                                      self.bacteria.cosines[key].keys())
+                angle_array = []
+                for i in range(len(angle_list)):
+                    angle_array = np.append(angle_array, angle_list[i])
+                angle_bins = np.arange(181)
+                angle_array = np.rad2deg(angle_array)
+                results, bin_edges = np.histogram(angle_array,
+                                                  bins=angle_bins)
+                angle_points = np.arange(180) + 0.5
+                graph_out = np.vstack((angle_points, results))
+                dat_name = os.path.join(self.plot_dir,
+                                        '%s_run_hist.dat' % (key))
+                gp.s(graph_out, dat_name)
+                plot_string = 'plot "%s" u 1:2 with points title "%s"'\
+                    % (dat_name, key)
+                gp.c(plot_string)
+
+

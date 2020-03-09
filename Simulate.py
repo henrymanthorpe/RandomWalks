@@ -218,7 +218,7 @@ class Bacterium:
 
                     elif self.vars.tumble_duration_variation is True:
                         current_tumble_length\
-                            = int(np.round(self.rand_gen.exponential(
+                            = int(np.ceil(self.rand_gen.exponential(
                                 self.vars.tumble_length_mean)))
 
                     else:
@@ -264,7 +264,7 @@ class Bacterium:
 
                     elif self.vars.tumble_duration_variation is True:
                         current_tumble_length\
-                            = int(np.round(self.rand_gen.exponential(
+                            = int(np.ceil(self.rand_gen.exponential(
                                 self.vars.tumble_length_mean)))
 
                     else:

@@ -19,7 +19,7 @@ except ImportError:
 
 
 def SingleRun(fname, bact, traj_dir, cosine_dir, append):
-    print("Started\t Config: %s \t %s \t" % (os.path.split(fname)[0], bact))
+    print("Started\t Config: %s \t %s \t" % (os.path.split(fname)[1], bact))
     traj_save_dir = os.path.join(traj_dir,
                                  os.path.splitext(os.path.split(fname)[1])[0])
     cosine_save_dir = os.path.join(cosine_dir,
@@ -45,8 +45,8 @@ def SingleRun(fname, bact, traj_dir, cosine_dir, append):
     np.savetxt(cosine_name, cosine_array, fmt='%+.8e', delimiter='\t')
     end = time.time()
     elapsed = end-start
-    print("Finished\t Config: %s \t %s \tTime taken %d" % (
-        os.path.split(fname)[0], bact, elapsed))
+    print("Finished\t Config: %s \t %s \tTime taken %f s" % (
+        os.path.split(fname)[1], bact, elapsed))
     return [traj_name, cosine_name]
 
 
@@ -56,53 +56,33 @@ class Bacteria:
         self.config = {}
         self.bacterium = {}
         self.cosines = {}
-
-    # def ConfigSweep(self, config_dir, repeats):
-    #     self.schedule_array = []
-    #     for entry in os.scandir(config_dir):
-    #         if entry.path.endswith('.in', -3):
-    #             self.config[os.path.splitext(os.path.split(entry.path)
-    #                                          [-1])[0]] = entry.path
-    #             self.bacterium[os.path.splitext(os.path.split(entry.path)
-    #                                             [-1])[0]] = {}
-    #             for i in range(repeats):
-    #                 self.schedule_array.append(['', '', ''])
-    #                 self.schedule_array[-1][0] = os.path.splitext(
-    #                     os.path.split(entry.path)[-1])[0]
-    #                 self.schedule_array[-1][1] = 'bact'+str(i)
-    #                 self.schedule_array[-1][2] = entry.path
-    #     out = [SingleRun(self.schedule_array[i][2])
-    #            for i in range(len(self.schedule_array))]
-    #     for i in range(len(self.schedule_array)):
-    #         self.bacterium[self.schedule_array[i][0]][
-    #             self.schedule_array[i][1]] = out[i]
+        self.config_path = {}
 
     def Import(self, config_dir, traj_dir, cosine_dir):
         for entry in os.scandir(config_dir):
             if entry.path.endswith('.in', -3):
                 self.config[os.path.splitext(os.path.split(entry.path)
-                                             [-1])[0]] = Variables(entry.path)
-                self.bacterium[os.path.splitext(os.path.split(entry.path)
-                                                [-1])[0]] = {}
-                self.cosines[os.path.splitext(os.path.split(entry.path)
-                                              [-1])[0]] = {}
+                                             [1])[0]] = Variables(entry.path)
         for entry in os.scandir(traj_dir):
             if entry.is_dir():
+                self.bacterium[os.path.split(entry)[1]] = {}
                 for traj_file in os.scandir(entry):
-                    self.bacterium[os.path.split(entry)[-1]]\
-                        [os.path.split(os.path.splitext(traj_file)[0])[-1]]\
+                    self.bacterium[os.path.split(entry)[1]]\
+                        [os.path.split(os.path.splitext(traj_file)[0])[1]]\
                         = traj_file.path
         for entry in os.scandir(cosine_dir):
             if entry.is_dir():
+                self.cosines[os.path.split(entry)[1]] = {}
                 for cosine_file in os.scandir(entry):
-                    self.cosines[os.path.split(entry)[-1]]\
-                        [os.path.split(os.path.splitext(cosine_file)[0])[-1]]\
+                    self.cosines[os.path.split(entry)[1]]\
+                        [os.path.split(os.path.splitext(cosine_file)[0])[1]]\
                         = cosine_file.path
 
     def ConfigSweep_Parallel(self, config_dir, traj_dir, cosine_dir,
                              repeats, threads, append):
         with Parallel(n_jobs=threads) as parallel:
-            self.schedule_array = []
+            schedule_array = []
+            digits = int(np.ceil(np.log10(repeats+1)))
             if not append:
                 for entry in os.scandir(traj_dir):
                     if entry.is_dir():
@@ -117,24 +97,28 @@ class Bacteria:
             for entry in os.scandir(config_dir):
                 if entry.path.endswith('.in', -3):
                     self.config[os.path.splitext(os.path.split(entry.path)
-                                                 [-1])[0]]\
+                                                 [1])[0]]\
                         = Variables(entry.path)
-                    self.bacterium[os.path.splitext(os.path.split(entry.path)
-                                                    [-1])[0]] = {}
-                    self.cosines[os.path.splitext(os.path.split(entry.path)
-                                                  [-1])[0]] = {}
-                    for i in range(repeats):
-                        self.schedule_array.append(['', '', ''])
-                        self.schedule_array[-1][0] = os.path.splitext(
-                            os.path.split(entry.path)[-1])[0]
-                        self.schedule_array[-1][1] = 'bact'+str(i)
-                        self.schedule_array[-1][2] = entry.path
-            out = parallel(delayed(SingleRun)(self.schedule_array[i][2],
-                                              self.schedule_array[i][1],
+                    self.config_path[os.path.splitext(os.path.split(entry.path)
+                                                 [1])[0]] = entry.path
+            for key in self.config.keys():
+                self.bacterium[key] = {}
+                self.cosines[key] = {}
+                for i in range(repeats):
+                    schedule = ['', '', '']
+                    schedule[0] = key
+                    bact_iter = str(i)
+                    while len(bact_iter) < digits:
+                        bact_iter = '0'+bact_iter
+                    schedule[1] = 'bact'+bact_iter
+                    schedule[2] = self.config_path[key]
+                    schedule_array.append(schedule)
+            out = parallel(delayed(SingleRun)(schedule_array[i][2],
+                                              schedule_array[i][1],
                                               traj_dir, cosine_dir, append)
-                           for i in range(len(self.schedule_array)))
-            for i in range(len(self.schedule_array)):
-                self.bacterium[self.schedule_array[i][0]][
-                    self.schedule_array[i][1]] = out[i][0]
-                self.cosines[self.schedule_array[i][0]][
-                    self.schedule_array[i][1]] = out[i][1]
+                           for i in range(len(schedule_array)))
+            for i in range(len(schedule_array)):
+                self.bacterium[schedule_array[i][0]][
+                    schedule_array[i][1]] = out[i][0]
+                self.cosines[schedule_array[i][0]][
+                    schedule_array[i][1]] = out[i][1]
