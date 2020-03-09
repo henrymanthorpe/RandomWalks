@@ -243,7 +243,7 @@ class Graphing:
                 gp.c(plot_string)
                 amalg_dat_name.append(dat_name)
                 amalg_titles.append('title "%s"' % (title))
-                print("Completed %s \t Run to Run angles" (key))
+                print("Completed %s \t Run to Run angles" % (key))
             amalg_formatting = 'u 1:2 with points'
             amalg_plot_string = plotStringMultiFile(len(amalg_dat_name),
                                                     amalg_dat_name,
