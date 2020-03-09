@@ -91,7 +91,8 @@ class Graphing:
             gp.c('set key top left')
             gp.c("set terminal pngcairo enhanced"
                  + " size 1600,1200 font 'ariel, 14'")
-            mega_plot_string = 'plot'
+            amalg_dat_name = []
+            amalg_titles = []
             for key in self.bacteria.bacterium.keys():
                 output = os.path.join(self.graph_dir,
                                       '%s_linear.png' % (key))
@@ -128,15 +129,19 @@ class Graphing:
                 plot_string = 'plot "%s" u 1:2:3 with yerrorbars' % (dat_name)
                 plot_string = plot_string + ' title "Mean Linear MSD"'
                 gp.c(plot_string)
-                mega_plot_string = mega_plot_string\
-                    + ' "%s" u 1:2:3 with yerrorbars title "%s"' % (dat_name,
-                                                                    key)
+                amalg_dat_name.append(dat_name)
+                amalg_titles.append('title "%s"' % (key))
+            amalg_formatting = 'with yerrorlines'
+            amalg_plot_string = plotStringMultiFile(len(amalg_dat_name),
+                                                    amalg_dat_name,
+                                                    amalg_formatting,
+                                                    amalg_titles)
             output = os.path.join(self.graph_dir, 'linear_mean_amalg.png')
             gp.c('set output "%s"' % (output))
             g_title = 'Analysis of Linear Mean Squared Displacement'
             gp.c('set title "%s"' % (g_title))
             gp.c('set xrange [*:*]')
-            gp.c(mega_plot_string)
+            gp.c(amalg_plot_string)
 
             mega_plot_string = 'plot'
             gp.c('set ylabel "MSD ({/Symbol q}^2)"')
@@ -189,6 +194,8 @@ class Graphing:
             gp.c('set xlabel "Probability Density"')
             gp.c('set ylabel "Run to Run Angle ({/Symbol \260})"')
             for key in self.bacteria.bacterium.keys():
+                if self.bacteria.config[key].archea_mode:
+                    continue
                 output = os.path.join(self.graph_dir,
                                       '%s_run_run_angle.png' % (key))
                 gp.c('set output "%s"' % (output))
