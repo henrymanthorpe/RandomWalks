@@ -330,7 +330,7 @@ class Bacterium:
                         chemotactic_run_length = current_run_length\
                             * (chemotactic_factor + 1)
 
-                    self.state = 'run-chemotactic'
+                    self.state = 'run_chemotactic'
 
 
                 # %% Erratic Tumble Mode
@@ -370,7 +370,7 @@ class Bacterium:
                         self.run_tumble_log['tumble'+str(q)]\
                             = current_tumble_length
                         if self.vars.chemotactic:
-                            self.state = 'run-chemotactic'
+                            self.state = 'run_chemotactic'
                         else:
                             self.state = 'run'
                     else:
@@ -423,7 +423,7 @@ class Bacterium:
                         self.run_tumble_log['tumble'+str(q)]\
                             = current_tumble_length
                         if self.vars.chemotactic:
-                            self.state = 'run-chemotactic'
+                            self.state = 'run_chemotactic'
                         else:
                             self.state = 'run'
                     else:
@@ -472,7 +472,7 @@ class Bacterium:
                         self.run_tumble_log['pause'+str(q)]\
                             = current_tumble_length
                         if self.vars.chemotactic:
-                            self.state = 'run-chemotactic'
+                            self.state = 'run_chemotactic'
                         else:
                             self.state = 'run'
                     else:
