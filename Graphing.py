@@ -94,6 +94,7 @@ class Graphing:
             amalg_dat_name = []
             amalg_titles = []
             for key in self.bacteria.bacterium.keys():
+                print('Started: %s \t Linear Analysis' % (key))
                 output = os.path.join(self.graph_dir,
                                       '%s_linear.png' % (key))
                 gp.c('set output "%s"' % (output))
@@ -131,6 +132,7 @@ class Graphing:
                 gp.c(plot_string)
                 amalg_dat_name.append(dat_name)
                 amalg_titles.append('title "%s"' % (key))
+                print('Completed %s \t Linear Analysis' % (key))
             amalg_formatting = 'with yerrorlines'
             amalg_plot_string = plotStringMultiFile(len(amalg_dat_name),
                                                     amalg_dat_name,
@@ -143,15 +145,17 @@ class Graphing:
             gp.c('set xrange [*:*]')
             gp.c(amalg_plot_string)
 
-            mega_plot_string = 'plot'
+            amalg_dat_name = []
+            amalg_titles = []
             gp.c('set ylabel "MSD ({/Symbol q}^2)"')
             for key in self.bacteria.bacterium.keys():
+                print("Started %s \t Rotational Analysis" % (key))
                 output = os.path.join(self.graph_dir,
                                       '%s_rotational.png' % (key))
                 gp.c('set output "%s"' % (output))
-                title = 'Analysis of Rotational Mean Squared Displacement - %s'\
-                    % (key)
-                gp.c('set title "%s"' % (title))
+                g_title = 'Analysis of Rotational Mean Squared '\
+                    + 'Displacement - %s' % (key)
+                gp.c('set title "%s"' % (g_title))
                 tau = Analysis.TauCalc(self.bacteria.config[key])
                 gp.c('set xrange [%f:%f]' % (tau.min()*0.75, tau.max()*0.75))
                 results_array = parallel(delayed(
@@ -181,20 +185,30 @@ class Graphing:
                 plot_string = 'plot "%s" u 1:2:3 with yerrorbars' % (dat_name)
                 plot_string = plot_string + ' title "Mean Rotational MSD"'
                 gp.c(plot_string)
-                mega_plot_string = mega_plot_string\
-                    + ' "%s" u 1:2:3 with yerrorbars title "%s"' % (dat_name,
-                                                                    key)
+                amalg_dat_name.append(dat_name)
+                amalg_titles.append('title "%s"' % (key))
+                print("Completed %s \t Rotational Analysis")
+            amalg_formatting = 'with yerrorlines'
+            amalg_plot_string = plotStringMultiFile(len(amalg_dat_name),
+                                                    amalg_dat_name,
+                                                    amalg_formatting,
+                                                    amalg_titles)
             output = os.path.join(self.graph_dir, 'rotational_mean_amalg.png')
+            gp.c('set output "%s"' % (output))
             g_title = 'Analysis of Rotational Mean Squared Displacement'
             gp.c('set title "%s"' % (g_title))
             gp.c('set xrange [*:*]')
-            gp.c(mega_plot_string)
-            mega_plot_string = 'plot'
+            gp.c(amalg_plot_string)
+
             gp.c('unset logscale')
             gp.c('set xlabel "Probability Density"')
             gp.c('set ylabel "Run to Run Angle ({/Symbol \260})"')
+            amalg_dat_name = []
+            amalg_titles = []
             for key in self.bacteria.bacterium.keys():
-                if self.bacteria.config[key].archea_mode:
+                print("Started %s \t Run to Run angles" % (key))
+                if self.bacteria.config[key].archaea_mode:
+                    print("%s  is an archaea, ignoring")
                     continue
                 output = os.path.join(self.graph_dir,
                                       '%s_run_run_angle.png' % (key))
@@ -209,18 +223,36 @@ class Graphing:
                 angle_array = []
                 for i in range(len(angle_list)):
                     angle_array = np.append(angle_array, angle_list[i])
-                angle_bins = np.arange(181)
+                angle_bins = np.arange(0, 181, 5)
                 angle_array = np.rad2deg(angle_array)
+                angle_mean = np.mean(angle_array)
+                angle_std = np.std(angle_array)
+                angle_med = np.median(angle_array)
                 results, bin_edges = np.histogram(angle_array,
                                                   bins=angle_bins,
                                                   density=True)
-                angle_points = np.arange(180) + 0.5
+                angle_points = np.arange(0, 180, 5) + 2.5
                 graph_out = np.vstack((angle_points, results))
+                title = "%s, Mean = %f, std. dev. = %f, Median = %f"\
+                    % (key, angle_mean, angle_std, angle_med)
                 dat_name = os.path.join(self.plot_dir,
                                         '%s_run_hist.dat' % (key))
                 gp.s(graph_out, dat_name)
                 plot_string = 'plot "%s" u 1:2 with points title "%s"'\
-                    % (dat_name, key)
+                    % (dat_name, title)
                 gp.c(plot_string)
-
+                amalg_dat_name.append(dat_name)
+                amalg_titles.append('title "%s"' % (title))
+                print("Completed %s \t Run to Run angles")
+            amalg_formatting = 'with yerrorlines'
+            amalg_plot_string = plotStringMultiFile(len(amalg_dat_name),
+                                                    amalg_dat_name,
+                                                    amalg_formatting,
+                                                    amalg_titles)
+            output = os.path.join(self.graph_dir, 'run_run_angle_amalg.png')
+            gp.c('set output "%s"' % (output))
+            g_title = 'Analysis of Run to Run Angles'
+            gp.c('set title "%s"' % (g_title))
+            gp.c('set xrange [*:*]')
+            gp.c(amalg_plot_string)
 
