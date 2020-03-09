@@ -488,8 +488,8 @@ class Bacterium:
 
                 # %% If self.state is unknown
                 else:
-                    print('Unknown expection occurred at sim_time %d '
-                          % (self.elapsed_time))
+                    print('Unknown state %s occurred at sim_time %d '
+                          % (self.state, self.elapsed_time))
                     break
 
         # %% Rotational Diffusion simulation for non-motile samples
