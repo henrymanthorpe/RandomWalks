@@ -228,7 +228,7 @@ class Bacterium:
                         chemotactic_run_length = current_run_length\
                             * (chemotactic_factor + 1)
 
-                    if self.archaea_mode:
+                    if self.vars.archaea_mode:
                         self.state = 'reverse-chemotactic'
                     else:
                         self.state = self.vars.tumble_type
