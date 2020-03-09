@@ -229,7 +229,7 @@ class Bacterium:
                             * (chemotactic_factor + 1)
 
                     if self.vars.archaea_mode:
-                        self.state = 'reverse-chemotactic'
+                        self.state = 'reverse_chemotactic'
                     else:
                         self.state = self.vars.tumble_type
 
