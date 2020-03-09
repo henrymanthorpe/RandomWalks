@@ -201,8 +201,8 @@ class Graphing:
             gp.c(amalg_plot_string)
 
             gp.c('unset logscale')
-            gp.c('set xlabel "Probability Density"')
-            gp.c('set ylabel "Run to Run Angle ({/Symbol \260})"')
+            gp.c('set ylabel "Probability Density"')
+            gp.c('set xlabel "Run to Run Angle ({/Symbol \260})"')
             amalg_dat_name = []
             amalg_titles = []
             for key in self.bacteria.bacterium.keys():
@@ -255,4 +255,3 @@ class Graphing:
             gp.c('set title "%s"' % (g_title))
             gp.c('set xrange [*:*]')
             gp.c(amalg_plot_string)
-

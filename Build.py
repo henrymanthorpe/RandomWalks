@@ -70,7 +70,7 @@ def main(argv):
             parser.parse_args(['-h'])
             sys.exit()
     for arg in args.batches:
-        print("Running in "+arg)
+        print("Starting %s at %s" % (arg, time.ctime()))
         if not os.path.exists(arg):
             print("Error: No such directory exists. (%s) " % (arg))
             parser.parse_args(['-h'])
