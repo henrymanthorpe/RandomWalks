@@ -25,7 +25,7 @@ def plotStringMultiFile(size, dat_name, formatting, title):
     plot_string = 'plot'
     for i in range(size):
         plot_string = plot_string\
-            + ' "%s" u 1:2:3 %s %s,' % (dat_name[i], formatting, title[i])
+            + ' "%s" %s %s,' % (dat_name[i], formatting, title[i])
     return plot_string
 
 
@@ -133,7 +133,7 @@ class Graphing:
                 amalg_dat_name.append(dat_name)
                 amalg_titles.append('title "%s"' % (key))
                 print('Completed %s \t Linear Analysis' % (key))
-            amalg_formatting = 'with yerrorlines'
+            amalg_formatting = 'u 1:2:3 with yerrorlines'
             amalg_plot_string = plotStringMultiFile(len(amalg_dat_name),
                                                     amalg_dat_name,
                                                     amalg_formatting,
@@ -187,8 +187,8 @@ class Graphing:
                 gp.c(plot_string)
                 amalg_dat_name.append(dat_name)
                 amalg_titles.append('title "%s"' % (key))
-                print("Completed %s \t Rotational Analysis")
-            amalg_formatting = 'with yerrorlines'
+                print("Completed %s \t Rotational Analysis" % (key))
+            amalg_formatting = 'u 1:2:3 with yerrorlines'
             amalg_plot_string = plotStringMultiFile(len(amalg_dat_name),
                                                     amalg_dat_name,
                                                     amalg_formatting,
@@ -243,8 +243,8 @@ class Graphing:
                 gp.c(plot_string)
                 amalg_dat_name.append(dat_name)
                 amalg_titles.append('title "%s"' % (title))
-                print("Completed %s \t Run to Run angles")
-            amalg_formatting = 'with yerrorlines'
+                print("Completed %s \t Run to Run angles" (key))
+            amalg_formatting = 'u 1:2 with points'
             amalg_plot_string = plotStringMultiFile(len(amalg_dat_name),
                                                     amalg_dat_name,
                                                     amalg_formatting,
