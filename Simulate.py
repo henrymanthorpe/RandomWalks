@@ -113,7 +113,7 @@ class Bacterium:
         # Linear Diffusion
         self.displacement += self.linear_diffusion
         self.displacement = np.vstack((self.pos_initial, self.displacement))
-        if self.chemotactic:
+        if self.vars.chemotactic:
             self.state = 'run_chemotactic'
             self.chemotactic_memory\
                 = [0 for x in range(self.vars.chem_mem_size)]
@@ -369,7 +369,7 @@ class Bacterium:
                         self.run_run_cosines.append(np.dot(start_vec, end_vec))
                         self.run_tumble_log['tumble'+str(q)]\
                             = current_tumble_length
-                        if self.chemotactic:
+                        if self.vars.chemotactic:
                             self.state = 'run-chemotactic'
                         else:
                             self.state = 'run'
@@ -422,7 +422,7 @@ class Bacterium:
                         self.run_run_cosines.append(np.dot(start_vec, end_vec))
                         self.run_tumble_log['tumble'+str(q)]\
                             = current_tumble_length
-                        if self.chemotactic:
+                        if self.vars.chemotactic:
                             self.state = 'run-chemotactic'
                         else:
                             self.state = 'run'
@@ -471,7 +471,7 @@ class Bacterium:
                         self.run_run_cosines.append(np.dot(start_vec, end_vec))
                         self.run_tumble_log['pause'+str(q)]\
                             = current_tumble_length
-                        if self.chemotactic:
+                        if self.vars.chemotactic:
                             self.state = 'run-chemotactic'
                         else:
                             self.state = 'run'
