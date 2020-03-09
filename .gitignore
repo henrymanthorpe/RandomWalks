@@ -16,3 +16,7 @@ plots/
 Batches/
 configs/
 log.txt
+error_log/
+trajectories/
+cosines/
+

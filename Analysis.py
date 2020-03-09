@@ -6,6 +6,7 @@ Created on Tue Feb 18 13:43:54 2020
 @author: henry
 """
 import numpy as np
+import os
 
 
 def LoadValues(fname, request):
@@ -47,17 +48,19 @@ def MSD(disp, tau_i, sample_total):
     return delta_mean
 
 
-def MSD_Rot(vect, tau_i, sample_total):
-    size = int(np.floor(sample_total/tau_i)-1)
-    if size == 0:
-        return -1
-    delta = np.zeros(size)
-    for i in range(size):
-        delta[i] = np.dot(vect[i*tau_i], vect[(i+1)*tau_i])
-    delta = np.arccos(delta)
-    delta = delta**2
-    delta_mean = np.mean(delta)
-    return delta_mean
+def MSD_Rot(vect, tau_i, sample_total, key):
+    with np.errstate(invalid='ignore'):
+        size = int(np.floor(sample_total/tau_i)-1)
+        if size == 0:
+            return -1
+        delta = np.zeros(size)
+        for i in range(size):
+            delta[i] = np.dot(vect[i*tau_i], vect[(i+1)*tau_i])
+        angles = np.arccos(delta)
+        angles = angles**2
+        angles_mean = np.nanmean(angles)
+        return angles_mean
+
 
 
 def Linear(bacterium, variables):
@@ -71,13 +74,14 @@ def Linear(bacterium, variables):
 
 
 def Rotational(bacterium, variables):
+    key = os.path.split(bacterium)[1]
     rotational_vect = LoadValues(bacterium, 'heading')
     tau = TauCalc(variables)
     results = np.zeros(len(tau))
     for i in range(len(tau)):
         tau_i = int(np.round(tau[i]/variables.base_time))
         results[i] = MSD_Rot(rotational_vect, tau_i,
-                             variables.sample_total)
+                             variables.sample_total, key)
     return results
 
 

@@ -132,12 +132,14 @@ class Graphing:
                     + ' "%s" u 1:2:3 with yerrorbars title "%s"' % (dat_name,
                                                                     key)
             output = os.path.join(self.graph_dir, 'linear_mean_amalg.png')
+            gp.c('set output "%s"' % (output))
             g_title = 'Analysis of Linear Mean Squared Displacement'
             gp.c('set title "%s"' % (g_title))
             gp.c('set xrange [*:*]')
             gp.c(mega_plot_string)
 
             mega_plot_string = 'plot'
+            gp.c('set ylabel "MSD ({/Symbol q}^2)"')
             for key in self.bacteria.bacterium.keys():
                 output = os.path.join(self.graph_dir,
                                       '%s_rotational.png' % (key))
@@ -184,8 +186,8 @@ class Graphing:
             gp.c(mega_plot_string)
             mega_plot_string = 'plot'
             gp.c('unset logscale')
-            gp.c('set xlabel "Counts"')
-            gp.c('set ylabel "Run to Run Angle (degrees)"')
+            gp.c('set xlabel "Probability Density"')
+            gp.c('set ylabel "Run to Run Angle ({/Symbol \260})"')
             for key in self.bacteria.bacterium.keys():
                 output = os.path.join(self.graph_dir,
                                       '%s_run_run_angle.png' % (key))
@@ -203,7 +205,8 @@ class Graphing:
                 angle_bins = np.arange(181)
                 angle_array = np.rad2deg(angle_array)
                 results, bin_edges = np.histogram(angle_array,
-                                                  bins=angle_bins)
+                                                  bins=angle_bins,
+                                                  density=True)
                 angle_points = np.arange(180) + 0.5
                 graph_out = np.vstack((angle_points, results))
                 dat_name = os.path.join(self.plot_dir,
