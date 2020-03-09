@@ -5,39 +5,140 @@ Created on Sun Feb 23 22:55:08 2020
 
 @author: henry
 """
+import sys
 import os
-import Interactive
 import configparser
 import numpy as np
-from Config import GetConfig
+from Config import GetConfig, Default
+from tempfile import TemporaryDirectory
+
 
 def MakeBatch():
-    batch_dir = input('Enter Batch Directory Name :')
-    config_dir = os.path.join(batch_dir,'configs')
+    print('Enter Batch Directory Name for new batch.')
+    batch_dir = input('>> ')
+    print('Enter Batch prefix.')
+    print('Warning, all configuration files with the same prefix will'
+          +' be deleted and replaced with new ones upon export.')
+    batch_name = input('>> ')
+    config_dir = os.path.join(batch_dir, 'configs')
     if not os.path.exists(batch_dir):
         os.mkdir(batch_dir)
         os.mkdir(config_dir)
     elif not os.path.exists(config_dir):
         os.mkdir(config_dir)
-    base_config = input('Enter Filename of config file :')
-    section, key = input('Enter section and key name :').split()
-    config = GetConfig(base_config)
-    start, stop, step_num = input('Enter start value, stop value, and number of steps :').split()
-    start = float(start)
-    stop = float(stop)
-    step_num = int(step_num)
-    step_val = (stop-start)/step_num
-    digits = int(np.ceil(np.log10(step_num+1)))
-    for i in range(step_num):
-        config.set(section,key,str(start+(i*step_val)))
-        file_iter = str(i)
-        while len(file_iter) < digits:
-            file_iter = '0'+file_iter
-        fname = key+'_'+file_iter+'.in'
-        save_name = os.path.join(config_dir,fname)
-        with open(save_name,'w') as f:
-            config.write(f)
-            f.close()
+    while True:
+        try:
+            print('Enter total number of configurations.')
+            total_configs = int(input('>> '))
+            print("Total configs =  %d" % (total_configs))
+            break
+        except ValueError:
+            print("Error: input is not a valid number.")
+            continue
+    temp = TemporaryDirectory()
+    while True:
+        print("Enter filename of the base configuration,")
+        print('or enter "default" to use the default configuration.')
+        config_input = input('>> ')
+        if config_input == 'default':
+            Default(temp.name, False)
+            config_input = os.path.join(temp.name, 'defaultconfig.in')
+            break
+        elif os.path.exists(config_input):
+            break
+        else:
+            print('Error: File does not exist:')
+            continue
+    initial_config = GetConfig(config_input)
+    batch_config = [GetConfig(config_input) for i in range(total_configs)]
+    temp.cleanup()
+    cancel = False
+    while True:
+        print('Enter Section and key name, (seperated by whitespace)')
+        print('Enter "export" to write batch configuration files,')
+        print('Or enter "cancel" to quit without saving')
+        user_input = input('>> ')
+        if user_input == 'cancel':
+            cancel = True
+            break
+        elif user_input == 'export':
+            break
+        elif len(user_input.split()) == 2:
+            section, key = user_input.split()
+            print('Input Successful')
+        else:
+            print('Error: Input of %s is invalid.' % (user_input))
+            continue
+        if section in initial_config.sections():
+            if key in initial_config[section].keys():
+                print("Key: %s, \t Current Value: %s" % (key,
+                                                         initial_config
+                                                         [section][key]))
+            else:
+                print('%s is not a valid key.')
+                break
+        else:
+            print('%s is not a valid section')
+            break
+        while True:
+            try:
+                print('Enter initial and final values '
+                      + '(seperated by whitespace) ')
+                print('Initial < Final')
+                start, stop = input('>> ').split()
+                start = float(start)
+                stop = float(stop)
+                if stop-start <= 0:
+                    raise ValueError()
+                break
+            except ValueError:
+                print('Error: Input is invalid')
+                continue
+        step_value = (stop-start)/(total_configs-1)
+        steps = ['%8.3g' % (start+(i*step_value))
+                 for i in range(total_configs)]
+        for i in range(total_configs):
+            batch_config[i][section][key] = str(steps[i])
+        print("Values:")
+        print(steps)
+        continue
+
+    if not cancel:
+        for entry in os.scandir(batch_dir):
+            if os.path.split(entry.path)[1].startswith(batch_name):
+                os.remove(entry.path)
+        digits = int(np.ceil(np.log10(total_configs+1)))
+        for i in range(total_configs):
+            file_iter = str(i)
+            while len(file_iter) < digits:
+                file_iter = '0'+file_iter
+            fname = "%s%s.in" % (batch_name, file_iter)
+            save_name = os.path.join(config_dir, fname)
+            with open(save_name, 'w') as f:
+                batch_config[i].write(f)
+                f.close()
+        print("Written %d configurations to %s" % (total_configs, config_dir))
+        return batch_dir
+    else:
+        print("Batch aborted by user.")
+        return ''
 
 
-
+def BatchBuilder():
+    print("Welcome to the Batch Builder")
+    print("----------------------------")
+    batches = []
+    while True:
+        new_batch = MakeBatch()
+        if new_batch not in batches and new_batch != '':
+            batches.append(new_batch)
+        while True:
+            print("Make another batch? (y/n)")
+            user_input = input('>> ')
+            if user_input.lower() in ['y', 'yes']:
+                break
+            elif user_input.lower() in ['n', 'no']:
+                return batches
+            else:
+                print("Error: input not valid.")
+                continue

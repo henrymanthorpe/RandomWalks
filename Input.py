@@ -11,11 +11,19 @@ from scipy import constants
 import sys
 
 
+def waterViscosityPoling(T):
+    A = 1.856e-11
+    B = 4209
+    C = 0.04527
+    D = -3.376e-5
+    return A*np.exp((B/T)+C*T+D*T**2)*1e3
+
+
 class Variables:
 
-    def __init__(self, fname=""):
+    def __init__(self, fname):
         tumble_states = ['smooth', 'erratic', 'pause']
-        chem_styles = ['linear', 'point']
+        chem_styles = ['linear']
         pi = np.pi
         boltz = constants.Boltzmann
         avo = constants.Avogadro
@@ -36,8 +44,16 @@ class Variables:
                       + ' from default config and try again.')
                 raise ValueError()
             self.particle_mass = self.phys.getfloat('mol_mass')/avo
-            self.viscosity = self.env.getfloat('viscosity')
+            self.viscosity = self.env.get('viscosity')
             self.temperature = self.env.getfloat('temp')
+            if self.viscosity == 'water':
+                if 273.0 < self.temperature < 373.0:
+                    self.viscosity = waterViscosityPoling(self.temperature)
+                else:
+                    print("Error: Temperature outside of valid range.")
+                    raise ValueError()
+            else:
+                self.viscosity = float(self.viscosity)
             self.start_pos = self.phys.get('start_pos')
             self.start_pos = np.array(self.start_pos.split(','),
                                       dtype=float)
@@ -108,6 +124,8 @@ class Variables:
                         = self.bact.getboolean('tumble_duration_var')
                     self.tumble_type = self.bact.get('tumble_type')
                     if self.tumble_type not in tumble_states:
+                        print("Error, %s is not a valid tumble mode." %
+                              (self.tumble_type))
                         raise ValueError()
                     self.tumble_ang_vel = np.deg2rad(self.bact.getfloat(
                                                             'tumble_velocity'))
@@ -121,6 +139,8 @@ class Variables:
             self.chemotactic = self.chem.getboolean('chemotactic')
             self.chem_style = self.chem.get('chemotactic_style')
             if self.chem_style not in chem_styles:
+                print("Error: %s not a valid chemotactic style"
+                      % (self.chem_style))
                 raise ValueError()
             self.chem_factor = self.chem.getfloat('chemotactic_factor')
             self.chem_memory = self.chem.getfloat('chemotactic_memory')
@@ -131,4 +151,5 @@ class Variables:
             if self.chem_source.shape != (3,):
                 raise ValueError()
         except ValueError:
+            print("Fatal Error: configuration %s is invalid.")
             sys.exit(1)

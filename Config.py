@@ -9,7 +9,7 @@ import os
 import configparser
 
 
-def Default(save_dir=''):
+def Default(save_dir='', verb=True):
     default_config = """
 # Default Configuration File
 
@@ -17,7 +17,7 @@ def Default(save_dir=''):
 # Bacteria Physical Variables
 
 # Molecular mass of bacteria strain (kg/mol)
-mol_mass = 15
+mol_mass = 15.0
 
 # Bacteria shape (Sphere or Ellipsoid)
 shape = Sphere
@@ -38,19 +38,24 @@ start_pos = 0,0,0
 # Defaults are for water in Standard Conditions
 
 # System Temperature (K)
-temp = 297
+temp = 297.0
 
 # Absolute Viscosity of the medium (kg/(m*s))
+# 'water' provides semi-empirical value for viscosity
+# at one atmosphere for 273 <= T <= 373
 viscosity = 8.9e-4
 
 [time]
 # Simulation Variables
 
 # Total simulation time (s)
-sim_time = 600
+sim_time = 600.0
 
 # Interval (step) time (s)
-base_time = 10e-3
+base_time = 5e-3
+
+# For these values, Computation time per repeat ~ 1 minute
+# and produces ~ 11MB of trajectory data per repeat
 
 [bact]
 # Run-Tumble Variables
@@ -74,7 +79,7 @@ tumble = yes
 tumble_type = smooth
 
 #Tumble Duration Variation
-tumble_duration_var =yes
+tumble_duration_var = yes
 
 #Mean Tumble Duration (s)
 tumble_duration_mean = 0.1
@@ -92,14 +97,14 @@ archaea_mode = no
 # Chemotactic Behaviour
 chemotactic = no
 
-# Chemotactic Style (linear/point)
+# Chemotactic Style (linear)
 chemotactic_style = linear
 
 # Chemotactic Axis/Source
 chemotactic_source = 0,0,1
 
 # Chemotactic Factor
-chemotactic_factor = 2
+chemotactic_factor = 1
 
 # Chemotactic Memory (s)
 chemotactic_memory = 0.1
@@ -121,9 +126,11 @@ entropy =
     f = open(fname, 'w')
     f.write(default_config)
     f.close()
-    print("Default Config File created as 'defaultconfig.in' in %s"
-          % (save_dir))
-    print("Please edit the contained values to those required for your needs.")
+    if verb:
+        print("Default Config File created as 'defaultconfig.in' in %s"
+              % (save_dir))
+        print("Please edit the contained values "
+              +"to those required for your needs.")
 
 
 def GetConfig(fname):

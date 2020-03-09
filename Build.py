@@ -40,6 +40,12 @@ def main(argv):
     parser.add_argument('-vis', '--visualisation', dest='vis',
                         action='store_true',
                         help='Exports data in visualisation format')
+    parser.add_argument('-b', '--batchbuild', dest='batchbuild', #
+                        action='store_true',
+                        help='Interactively build sets of configuration'
+                        + ' files from a base configuration. \n'
+                        + 'If done with -i or -o, will automatically'
+                        + 'simulate batch.')
     parser.add_argument('batches', nargs='*',
                         help='Root Directory for batch files')
     args = parser.parse_args()

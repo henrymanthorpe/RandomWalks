@@ -202,7 +202,7 @@ class Graphing:
 
             gp.c('unset logscale')
             gp.c('set ylabel "Probability Density"')
-            gp.c('set xlabel "Run to Run Angle ({/Symbol \260})"')
+            gp.c('set xlabel "Run to Run Angle (degrees)"')
             amalg_dat_name = []
             amalg_titles = []
             for key in self.bacteria.bacterium.keys():
@@ -233,7 +233,7 @@ class Graphing:
                                                   density=True)
                 angle_points = np.arange(0, 180, 5) + 2.5
                 graph_out = np.vstack((angle_points, results))
-                title = "%s, Mean = %f, std. dev. = %f, Median = %f"\
+                title = "%s, Mean = %6.2f, std. dev. = %6.2f, Median = %6.2f"\
                     % (key, angle_mean, angle_std, angle_med)
                 dat_name = os.path.join(self.plot_dir,
                                         '%s_run_hist.dat' % (key))

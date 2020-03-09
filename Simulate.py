@@ -15,6 +15,8 @@ from numpy.random import Generator, PCG64, SeedSequence
 vec_z = np.array([0, 0, 1])
 pi = np.pi
 
+# %% Tumble Functions
+
 
 def Normalise(vec):
     return vec/np.linalg.norm(vec)
@@ -38,6 +40,8 @@ def Tumble(diff_angle, spin_angle, vec_int):
     vec_final = quaternion.rotate_vectors(spin_quat, vec_mid)
     return vec_final
 
+# %% Bacterium Class Initialisation
+
 
 class Bacterium:
 
@@ -51,6 +55,8 @@ class Bacterium:
         self.time = np.append([0], self.time)
         self.time = np.cumsum(self.time)
         self.time = np.reshape(self.time, (self.time.size, 1))
+
+# %% Extra Functions
 
     def ReSeed(self, entropy):
         self.seed = SeedSequence(entropy)
@@ -81,6 +87,8 @@ class Bacterium:
                          self.spin_sample[i],
                          self.vectors_cartesian_diffusion[i-1])
 
+# %% Simulation Code Path
+
     def Complete(self):
         # Diffusion Sampling
         self.std_dev_linear = 2*self.vars.step_linear\
@@ -105,21 +113,29 @@ class Bacterium:
         # Linear Diffusion
         self.displacement += self.linear_diffusion
         self.displacement = np.vstack((self.pos_initial, self.displacement))
-        self.state = 'run'
+        if self.chemotactic:
+            self.state = 'run_chemotactic'
+            self.chemotactic_memory\
+                = [0 for x in range(self.vars.chem_mem_size)]
+        else:
+            self.state = 'run'
         self.elapsed_time = 0
         p = 0  # Run Counter
         q = 0  # Tumble Counter
         self.run_tumble_log = {}  # Logs Run&Tumble Behaviour
         self.run_run_cosines = []
+
         if self.vars.run_behaviour is True:
 
             while self.elapsed_time < self.vars.sample_total:
 
-                if self.state == 'run':  # Standard Run Mode
+                # %% Run Mode - Non Chemotactic
+
+                if self.state == 'run':
                     q += 1
 
                     if self.vars.run_variation is True:
-                        current_run_length = int(np.round(
+                        current_run_length = int(np.ceil(
                             self.rand_gen.exponential(
                                 self.vars.run_length_mean)))
 
@@ -164,11 +180,66 @@ class Bacterium:
                                 = self.vars.sample_total - self.elapsed_time
                         break
 
-                if self.state == 'reverse':  # Archaea Reverse Mode
+                # %% Run Mode - Chemotactic
+
+                elif self.state == 'run_chemotactic':
+                    q += 1
+
+                    if self.vars.run_variation is True:
+                        current_run_length = int(np.ceil(
+                            self.rand_gen.exponential(
+                                self.vars.run_length_mean)))
+
+                    else:
+                        current_run_length = self.vars.run_length_mean
+
+                    elapsed_run_length = 0
+                    chemotactic_factor = np.mean(self.chemotactic_memory)\
+                        * self.vars.chem_factor
+                    if chemotactic_factor < 0:
+                        chemotactic_factor = 0
+                    chemotactic_run_length = current_run_length\
+                        * (chemotactic_factor + 1)
+
+                    while elapsed_run_length < chemotactic_run_length:
+                        if self.elapsed_time < self.vars.sample_total:
+                            break
+                        i = self.elapsed_time
+                        self.vectors_cartesian[i+1]\
+                            = Tumble(self.diffusion_sample[i],
+                                     self.spin_sample[i],
+                                     self.vectors_cartesian[i])
+
+                        self.displacement[i+1]\
+                            += self.vectors_cartesian[i+1]\
+                            * self.vars.run_step
+
+                        self.elapsed_time += 1
+                        elapsed_run_length += 1
+
+                        chemotactic_value = np.dot(self.vectors_cartesian[i+1],
+                                                   self.vars.chem_source)
+                        self.chemotactic_memory.pop(0)
+                        self.chemotactic_memory.append(chemotactic_value)
+                        chemotactic_factor = np.mean(self.chemotactic_memory)\
+                            * self.vars.chem_factor
+                        if chemotactic_factor < 0:
+                            chemotactic_factor = 0
+                        chemotactic_run_length = current_run_length\
+                            * (chemotactic_factor + 1)
+
+                    if self.archaea_mode:
+                        self.state = 'reverse-chemotactic'
+                    else:
+                        self.state = self.vars.tumble_type
+
+                # %% Reverse Mode - For Archaea
+
+                elif self.state == 'reverse':  # Archaea Reverse Mode
                     p += 1
 
                     if self.vars.run_variation is True:
-                        current_run_length = int(np.round(
+                        current_run_length = int(np.ceil(
                             self.rand_gen.exponential(
                                 self.vars.run_length_mean)))
 
@@ -187,8 +258,8 @@ class Bacterium:
                                          self.vectors_cartesian[i])
 
                             self.displacement[i+1]\
-                                -= self.vectors_cartesian[i+1]\
-                                * self.vars.run_step
+                                += self.vectors_cartesian[i+1]\
+                                * -self.vars.run_step
 
                         self.elapsed_time += current_run_length
                         self.run_tumble_log['reverse'+str(p)]\
@@ -211,7 +282,60 @@ class Bacterium:
                                 = self.vars.sample_total - self.elapsed_time
                         break
 
-                elif self.state == 'erratic':  # Pause Tumble Behaviour (rhodo)
+                # %% Reverse Mode - For Chemotactic archaea
+
+                elif self.state == 'reverse_chemotactic':
+                    q += 1
+
+                    if self.vars.run_variation is True:
+                        current_run_length = int(np.ceil(
+                            self.rand_gen.exponential(
+                                self.vars.run_length_mean)))
+
+                    else:
+                        current_run_length = self.vars.run_length_mean
+
+                    elapsed_run_length = 0
+                    chemotactic_factor = np.mean(self.chemotactic_memory)\
+                        * self.vars.chem_factor
+                    if chemotactic_factor < 0:
+                        chemotactic_factor = 0
+                    chemotactic_run_length = current_run_length\
+                        * (chemotactic_factor + 1)
+
+                    while elapsed_run_length < chemotactic_run_length:
+                        if self.elapsed_time < self.vars.sample_total:
+                            break
+                        i = self.elapsed_time
+                        self.vectors_cartesian[i+1]\
+                            = Tumble(self.diffusion_sample[i],
+                                     self.spin_sample[i],
+                                     self.vectors_cartesian[i])
+
+                        self.displacement[i+1]\
+                            += self.vectors_cartesian[i+1]\
+                            * -self.vars.run_step
+
+                        self.elapsed_time += 1
+                        elapsed_run_length += 1
+
+                        chemotactic_value = np.dot(self.vectors_cartesian[i+1],
+                                                   self.vars.chem_source)
+                        self.chemotactic_memory.pop(0)
+                        self.chemotactic_memory.append(chemotactic_value)
+                        chemotactic_factor = np.mean(self.chemotactic_memory)\
+                            * self.vars.chem_factor
+                        if chemotactic_factor < 0:
+                            chemotactic_factor = 0
+                        chemotactic_run_length = current_run_length\
+                            * (chemotactic_factor + 1)
+
+                    self.state = 'run-chemotactic'
+
+
+                # %% Erratic Tumble Mode
+
+                elif self.state == 'erratic':
                     q += 1
                     if self.vars.tumble_duration_mean == 0:
                         current_tumble_length = 0
@@ -245,7 +369,10 @@ class Bacterium:
                         self.run_run_cosines.append(np.dot(start_vec, end_vec))
                         self.run_tumble_log['tumble'+str(q)]\
                             = current_tumble_length
-                        self.state = 'run'
+                        if self.chemotactic:
+                            self.state = 'run-chemotactic'
+                        else:
+                            self.state = 'run'
                     else:
                         for i in range(self.elapsed_time,
                                        self.vars.sample_total):
@@ -257,7 +384,9 @@ class Bacterium:
                                 = self.vars.sample_total-self.elapsed_time
                         break
 
-                elif self.state == 'smooth':  # Pause Tumble Behaviour (rhodo)
+                # %% Smooth Tumble Mode
+
+                elif self.state == 'smooth':
                     q += 1
                     if self.vars.tumble_duration_mean == 0:
                         current_tumble_length = 0
@@ -293,7 +422,10 @@ class Bacterium:
                         self.run_run_cosines.append(np.dot(start_vec, end_vec))
                         self.run_tumble_log['tumble'+str(q)]\
                             = current_tumble_length
-                        self.state = 'run'
+                        if self.chemotactic:
+                            self.state = 'run-chemotactic'
+                        else:
+                            self.state = 'run'
                     else:
                         for i in range(self.elapsed_time,
                                        self.vars.sample_total):
@@ -304,7 +436,10 @@ class Bacterium:
                             self.run_tumble_log['tumble'+str(q)]\
                                 = self.vars.sample_total-self.elapsed_time
                         break
-                elif self.state == 'pause':  # Pause Tumble Behaviour (rhodo)
+
+                # %% Pause Tumble Mode
+
+                elif self.state == 'pause':
                     q += 1
 
                     if self.vars.tumble_duration_mean == 0:
@@ -312,7 +447,7 @@ class Bacterium:
 
                     elif self.vars.tumble_duration_variation is True:
                         current_tumble_length\
-                            = int(np.round(self.rand_gen.exponential(
+                            = int(np.ceil(self.rand_gen.exponential(
                                 self.vars.tumble_length_mean)))
 
                     else:
@@ -336,7 +471,10 @@ class Bacterium:
                         self.run_run_cosines.append(np.dot(start_vec, end_vec))
                         self.run_tumble_log['pause'+str(q)]\
                             = current_tumble_length
-                        self.state = 'run'
+                        if self.chemotactic:
+                            self.state = 'run-chemotactic'
+                        else:
+                            self.state = 'run'
                     else:
                         for i in range(self.elapsed_time,
                                        self.vars.sample_total):
@@ -347,7 +485,21 @@ class Bacterium:
                             self.run_tumble_log['pause'+str(q)]\
                                 = self.vars.sample_total-self.elapsed_time
                         break
+
+                # %% If self.state is unknown
                 else:
-                    print('Unknown expection occurred at sim_time {} '.format(
-                        self.elapsed_time))
+                    print('Unknown expection occurred at sim_time %d '
+                          % (self.elapsed_time))
                     break
+
+        # %% Rotational Diffusion simulation for non-motile samples
+
+        else:
+            for i in range(self.elapsed_time,
+                           self.vars.sample_total):
+                self.vectors_cartesian[i+1] = Tumble(
+                    self.diffusion_sample[i],
+                    self.spin_sample[i],
+                    self.vectors_cartesian[i])
+                self.run_tumble_log['pause'+str(q)]\
+                    = self.vars.sample_total-self.elapsed_time
