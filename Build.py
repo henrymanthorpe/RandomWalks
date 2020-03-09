@@ -98,7 +98,7 @@ def main(argv):
         vis_dir = os.path.join(arg, 'visualisation')
         if not os.path.exists(vis_dir):
             os.mkdir(vis_dir)
-            print("Cosines Directory not found, making %s " % (vis_dir))
+            print("Visualisation Directory not found, making %s " % (vis_dir))
 
         if len(os.listdir(config_dir)) == 0:
             print("No config files found in %s" % (config_dir))
