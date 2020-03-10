@@ -203,7 +203,7 @@ class Bacterium:
                         * (chemotactic_factor + 1)
 
                     while elapsed_run_length < chemotactic_run_length:
-                        if self.elapsed_time < self.vars.sample_total:
+                        if self.elapsed_time > self.vars.sample_total:
                             break
                         i = self.elapsed_time
                         self.vectors_cartesian[i+1]\
@@ -305,7 +305,7 @@ class Bacterium:
                         * (chemotactic_factor + 1)
 
                     while elapsed_run_length < chemotactic_run_length:
-                        if self.elapsed_time < self.vars.sample_total:
+                        if self.elapsed_time > self.vars.sample_total:
                             break
                         i = self.elapsed_time
                         self.vectors_cartesian[i+1]\
