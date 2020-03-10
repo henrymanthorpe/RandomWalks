@@ -140,6 +140,8 @@ class Bacteria:
             for key in self.config.keys():
                 self.bacterium[key] = {}
                 self.cosines[key] = {}
+                self.run_log[key] = {}
+                self.tumble_log[key] = {}
                 for i in range(repeats):
                     schedule = ['', '', '']
                     schedule[0] = key
