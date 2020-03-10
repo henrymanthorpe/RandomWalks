@@ -128,7 +128,7 @@ class Bacteria:
                 for entry in os.scandir(duration_dir):
                     if entry.is_dir():
                         for duration_file in os.scandir(entry):
-                            os.remove(cosine_file)
+                            os.remove(duration_file)
                     os.rmdir(entry)
             for entry in os.scandir(config_dir):
                 if entry.path.endswith('.in', -3):
