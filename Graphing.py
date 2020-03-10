@@ -208,7 +208,7 @@ class Graphing:
             for key in self.bacteria.bacterium.keys():
                 print("Started %s \t Run to Run angles" % (key))
                 if self.bacteria.config[key].archaea_mode:
-                    print("%s  is an archaea, ignoring")
+                    print("%s  is an archaea, ignoring" % (key))
                     continue
                 output = os.path.join(self.graph_dir,
                                       '%s_run_run_angle.png' % (key))
