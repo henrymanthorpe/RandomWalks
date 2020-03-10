@@ -125,18 +125,22 @@ def main(argv):
         if not os.path.exists(vis_dir):
             os.mkdir(vis_dir)
             print("Visualisation Directory not found, making %s " % (vis_dir))
-
+        duration_dir = os.path.join(arg, 'durations')
+        if not os.path.exists(duration_dir):
+            os.mkdir(duration_dir)
+            print("Duration Directory not found, making %s " % (duration_dir))
         if len(os.listdir(config_dir)) == 0:
             print("No config files found in %s" % (config_dir))
             Default(config_dir)
             sys.exit()
         batch = Bacteria()
         if args.importing:
-            batch.Import(config_dir, traj_dir, cosine_dir)
+            batch.Import(config_dir, traj_dir, cosine_dir, duration_dir)
             print('Import Complete for %s' % (arg))
         else:
             start = time.time()
             batch.ConfigSweep_Parallel(config_dir, traj_dir, cosine_dir,
+                                       duration_dir,
                                        args.repeats, args.threads, mode)
             end = time.time()
             print('Simulation complete for %s' % (arg))

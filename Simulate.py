@@ -122,7 +122,8 @@ class Bacterium:
         self.elapsed_time = 0
         p = 0  # Run Counter
         q = 0  # Tumble Counter
-        self.run_tumble_log = {}  # Logs Run&Tumble Behaviour
+        self.run_log = []
+        self.tumble_log = []  # Logs Run&Tumble Behaviour
         self.run_run_cosines = []
 
         if self.vars.run_behaviour is True:
@@ -158,7 +159,7 @@ class Bacterium:
                                 * self.vars.run_step
 
                         self.elapsed_time += current_run_length
-                        self.run_tumble_log['run'+str(q)] = current_run_length
+                        self.run_log.append(current_run_length)
                         if self.vars.archaea_mode:
                             self.state = 'reverse'
                         else:
@@ -176,8 +177,8 @@ class Bacterium:
                                 += self.vectors_cartesian[i+1]\
                                 * self.vars.run_step
 
-                            self.run_tumble_log['reverse'+str(q)]\
-                                = self.vars.sample_total - self.elapsed_time
+                            self.run.append(self.vars.sample_total
+                                            - self.elapsed_time)
                         break
 
                 # %% Run Mode - Chemotactic
@@ -228,6 +229,8 @@ class Bacterium:
                         chemotactic_run_length = current_run_length\
                             * (chemotactic_factor + 1)
 
+                    self.run_log.append(elapsed_run_length)
+
                     if self.vars.archaea_mode:
                         self.state = 'reverse_chemotactic'
                     else:
@@ -262,8 +265,7 @@ class Bacterium:
                                 * -self.vars.run_step
 
                         self.elapsed_time += current_run_length
-                        self.run_tumble_log['reverse'+str(p)]\
-                            = current_run_length
+                        self.run_log.append(current_run_length)
                         self.state = 'run'
                     else:
                         for i in range(self.elapsed_time,
@@ -278,8 +280,8 @@ class Bacterium:
                                 += self.vectors_cartesian[i+1]\
                                 * self.vars.run_step
 
-                            self.run_tumble_log['run'+str(p)]\
-                                = self.vars.sample_total - self.elapsed_time
+                            self.run_log.append(
+                                self.vars.sample_total - self.elapsed_time)
                         break
 
                 # %% Reverse Mode - For Chemotactic archaea
@@ -330,8 +332,9 @@ class Bacterium:
                         chemotactic_run_length = current_run_length\
                             * (chemotactic_factor + 1)
 
-                    self.state = 'run_chemotactic'
+                    self.run_log.append(elapsed_run_length)
 
+                    self.state = 'run_chemotactic'
 
                 # %% Erratic Tumble Mode
 
@@ -367,8 +370,7 @@ class Bacterium:
                         self.elapsed_time += current_tumble_length
                         end_vec = self.vectors_cartesian[self.elapsed_time]
                         self.run_run_cosines.append(np.dot(start_vec, end_vec))
-                        self.run_tumble_log['tumble'+str(q)]\
-                            = current_tumble_length
+                        self.tumble_log.append(current_tumble_length)
                         if self.vars.chemotactic:
                             self.state = 'run_chemotactic'
                         else:
@@ -380,8 +382,8 @@ class Bacterium:
                                 self.diffusion_sample[i],
                                 self.spin_sample[i],
                                 self.vectors_cartesian[i])
-                            self.run_tumble_log['tumble'+str(q)]\
-                                = self.vars.sample_total-self.elapsed_time
+                            self.tumble_log.append(
+                                self.vars.sample_total-self.elapsed_time)
                         break
 
                 # %% Smooth Tumble Mode
@@ -420,8 +422,7 @@ class Bacterium:
                                      self.vectors_cartesian[self.elapsed_time])
                         end_vec = self.vectors_cartesian[self.elapsed_time]
                         self.run_run_cosines.append(np.dot(start_vec, end_vec))
-                        self.run_tumble_log['tumble'+str(q)]\
-                            = current_tumble_length
+                        self.tumble_log.append(current_tumble_length)
                         if self.vars.chemotactic:
                             self.state = 'run_chemotactic'
                         else:
@@ -433,8 +434,8 @@ class Bacterium:
                                 self.diffusion_sample[i],
                                 self.spin_sample[i],
                                 self.vectors_cartesian[i])
-                            self.run_tumble_log['tumble'+str(q)]\
-                                = self.vars.sample_total-self.elapsed_time
+                            self.tumble_log.append(
+                                self.vars.sample_total-self.elapsed_time)
                         break
 
                 # %% Pause Tumble Mode
@@ -469,8 +470,7 @@ class Bacterium:
                         self.elapsed_time += current_tumble_length
                         end_vec = self.vectors_cartesian[self.elapsed_time]
                         self.run_run_cosines.append(np.dot(start_vec, end_vec))
-                        self.run_tumble_log['pause'+str(q)]\
-                            = current_tumble_length
+                        self.tumble_log.append(current_tumble_length)
                         if self.vars.chemotactic:
                             self.state = 'run_chemotactic'
                         else:
@@ -482,8 +482,8 @@ class Bacterium:
                                 self.diffusion_sample[i],
                                 self.spin_sample[i],
                                 self.vectors_cartesian[i])
-                            self.run_tumble_log['pause'+str(q)]\
-                                = self.vars.sample_total-self.elapsed_time
+                            self.tumble_log.append(
+                                self.vars.sample_total-self.elapsed_time)
                         break
 
                 # %% If self.state is unknown
@@ -501,5 +501,3 @@ class Bacterium:
                     self.diffusion_sample[i],
                     self.spin_sample[i],
                     self.vectors_cartesian[i])
-                self.run_tumble_log['pause'+str(q)]\
-                    = self.vars.sample_total-self.elapsed_time

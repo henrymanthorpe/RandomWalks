@@ -26,6 +26,11 @@ def LoadCosines(fname):
     return values
 
 
+def LoadDurations(fname):
+    values = np.loadtxt(fname).astype(int)
+    return values
+
+
 def TauCalc(variables):
     sample_total = int(np.floor(np.log2(variables.sim_time
                                         / variables.base_time)))
@@ -102,3 +107,9 @@ def RunRunAngles(cosines):
     cosine_array = LoadCosines(cosines)
     angle_array = np.arccos(cosine_array)
     return angle_array
+
+
+def GetTimes(duration, variables):
+    duration_array = LoadDurations(duration)
+    time_array = duration_array*variables.base_time
+    return time_array

@@ -18,19 +18,26 @@ except ImportError:
     print('joblib not found, parallelisation not available')
 
 
-def SingleRun(fname, bact, traj_dir, cosine_dir, append):
+def SingleRun(fname, bact, traj_dir, cosine_dir, duration_dir, append):
     print("Started\t Config: %s \t %s \t" % (os.path.split(fname)[1], bact))
     traj_save_dir = os.path.join(traj_dir,
                                  os.path.splitext(os.path.split(fname)[1])[0])
     cosine_save_dir = os.path.join(cosine_dir,
                                    os.path.splitext(
                                        os.path.split(fname)[1])[0])
+    duration_save_dir = os.path.join(duration_dir,
+                                     os.path.splitext(
+                                       os.path.split(fname)[1])[0])
     if not os.path.exists(traj_save_dir):
         os.mkdir(traj_save_dir)
     if not os.path.exists(cosine_save_dir):
         os.mkdir(cosine_save_dir)
-    traj_name = os.path.join(traj_save_dir, bact+".txt")
-    cosine_name = os.path.join(cosine_save_dir, bact+'.txt')
+    if not os.path.exists(traj_save_dir):
+        os.mkdir(duration_save_dir)
+    traj_name = os.path.join(traj_save_dir, "%s.txt" % (bact))
+    cosine_name = os.path.join(cosine_save_dir, '%s.txt' % (bact))
+    run_log_name = os.path.join(duration_save_dir, 'run_%s.txt' % (bact))
+    tumble_log_name = os.path.join(duration_save_dir, 'tumble_%s.txt' % (bact))
     if os.path.exists(traj_name) and os.path.exists(cosine_name) and append:
         print("Value prexists, not recalulating")
         return [traj_name, cosine_name]
@@ -43,11 +50,15 @@ def SingleRun(fname, bact, traj_dir, cosine_dir, append):
     np.savetxt(traj_name, export, fmt='%+.5e', delimiter='\t')
     cosine_array = bacterium.run_run_cosines
     np.savetxt(cosine_name, cosine_array, fmt='%+.8e', delimiter='\t')
+    run_log = bacterium.run_log
+    np.savetxt(run_log_name, run_log, fmt='%d')
+    tumble_log = bacterium.tumble_log
+    np.savetxt(tumble_log_name, tumble_log, fmt='%d')
     end = time.time()
     elapsed = end-start
     print("Finished\t Config: %s \t %s \tTime taken %f s" % (
         os.path.split(fname)[1], bact, elapsed))
-    return [traj_name, cosine_name]
+    return [traj_name, cosine_name, run_log_name, tumble_log_name]
 
 
 class Bacteria:
@@ -57,8 +68,10 @@ class Bacteria:
         self.bacterium = {}
         self.cosines = {}
         self.config_path = {}
+        self.run_log = {}
+        self.tumble_log = {}
 
-    def Import(self, config_dir, traj_dir, cosine_dir):
+    def Import(self, config_dir, traj_dir, cosine_dir, duration_dir):
         for entry in os.scandir(config_dir):
             if entry.path.endswith('.in', -3):
                 self.config[os.path.splitext(os.path.split(entry.path)
@@ -67,18 +80,34 @@ class Bacteria:
             if entry.is_dir():
                 self.bacterium[os.path.split(entry)[1]] = {}
                 for traj_file in os.scandir(entry):
-                    self.bacterium[os.path.split(entry)[1]]\
-                        [os.path.split(os.path.splitext(traj_file)[0])[1]]\
+                    self.bacterium[os.path.split(entry)[1]][
+                        os.path.split(os.path.splitext(traj_file)[0])[1]]\
                         = traj_file.path
         for entry in os.scandir(cosine_dir):
             if entry.is_dir():
                 self.cosines[os.path.split(entry)[1]] = {}
                 for cosine_file in os.scandir(entry):
-                    self.cosines[os.path.split(entry)[1]]\
-                        [os.path.split(os.path.splitext(cosine_file)[0])[1]]\
+                    self.cosines[os.path.split(entry)[1]][
+                        os.path.split(os.path.splitext(cosine_file)[0])[1]]\
                         = cosine_file.path
+        for entry in os.scandir(duration_dir):
+            if entry.is_dir():
+                self.run_log[os.path.split(entry)[1]] = {}
+                self.tumble_log[os.path.split(entry)[1]] = {}
+                for log_file in os.scandir(entry):
+                    if os.path.split(log_file)[1].startswith('run'):
+                        key = os.path.splitext(
+                            os.path.split(log_file)[1])[0].split('_')[1]
+                        self.run_log[os.path.split(entry)[1]][
+                            key] = log_file.path
+                    elif os.path.split(log_file)[1].startswith('tumble'):
+                        key = os.path.splitext(
+                            os.path.split(log_file)[1])[0].split('_')[1]
+                        self.tumble_log[os.path.split(entry)[1]][
+                            key] = log_file.path
 
     def ConfigSweep_Parallel(self, config_dir, traj_dir, cosine_dir,
+                             duration_dir,
                              repeats, threads, append):
         with Parallel(n_jobs=threads) as parallel:
             schedule_array = []
@@ -94,13 +123,18 @@ class Bacteria:
                         for cosine_file in os.scandir(entry):
                             os.remove(cosine_file)
                     os.rmdir(entry)
+                for entry in os.scandir(duration_dir):
+                    if entry.is_dir():
+                        for duration_file in os.scandir(entry):
+                            os.remove(cosine_file)
+                    os.rmdir(entry)
             for entry in os.scandir(config_dir):
                 if entry.path.endswith('.in', -3):
                     self.config[os.path.splitext(os.path.split(entry.path)
                                                  [1])[0]]\
                         = Variables(entry.path)
                     self.config_path[os.path.splitext(os.path.split(entry.path)
-                                                 [1])[0]] = entry.path
+                                                      [1])[0]] = entry.path
             for key in self.config.keys():
                 self.bacterium[key] = {}
                 self.cosines[key] = {}
@@ -115,10 +149,15 @@ class Bacteria:
                     schedule_array.append(schedule)
             out = parallel(delayed(SingleRun)(schedule_array[i][2],
                                               schedule_array[i][1],
-                                              traj_dir, cosine_dir, append)
+                                              traj_dir, cosine_dir,
+                                              duration_dir, append)
                            for i in range(len(schedule_array)))
             for i in range(len(schedule_array)):
                 self.bacterium[schedule_array[i][0]][
                     schedule_array[i][1]] = out[i][0]
                 self.cosines[schedule_array[i][0]][
                     schedule_array[i][1]] = out[i][1]
+                self.run_log[schedule_array[i][0]][
+                    schedule_array[i][1]] = out[i][2]
+                self.tumble_log[schedule_array[i][0]][
+                    schedule_array[i][1]] = out[i][3]

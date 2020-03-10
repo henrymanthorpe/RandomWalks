@@ -143,7 +143,7 @@ class Graphing:
 
             gp.c('reset')
             gp.c('set xlabel "{/Symbol t} (s)"')
-            gp.c('set ylabel "MSD ({/Symbol q}^2)"')
+            gp.c('set ylabel "MSD (m^2)"')
             gp.c('set key top left')
             gp.c("set terminal pngcairo enhanced"
                  + " size 1600,1200 font 'ariel, 14'")
@@ -322,3 +322,122 @@ class Graphing:
             gp.c('set title "%s"' % (g_title))
             gp.c('set xrange [*:*]')
             gp.c(amalg_plot_string)
+
+            gp.c('reset')
+            gp.c('set key top left')
+            gp.c("set terminal pngcairo enhanced"
+                 + " size 1600,1200 font 'ariel, 14'")
+            gp.c('set logscale y')
+            gp.c('set ylabel "Probability Density"')
+            gp.c('set xlabel "Run Duration (s)"')
+            gp.c('set xrange [*:*]')
+            amalg_dat_name = []
+            amalg_titles = []
+            for key in self.bacteria.bacterium.keys():
+                print("Started %s \t Run durations" % (key))
+
+                output = os.path.join(self.graph_dir,
+                                      '%s_run_duration.png' % (key))
+                gp.c('set output "%s"' % (output))
+                title = 'Analysis of Run duration - %s'\
+                    % (key)
+                gp.c('set title "%s" noenhanced' % (title))
+                time_list = parallel(delayed(Analysis.GetTimes)
+                                     (self.bacteria.run_log[key][bact],
+                                      self.bacteria.config[key][bact])
+                                     for bact in
+                                     self.bacteria.run_log[key].keys())
+                time_array = []
+                for i in range(len(time_list)):
+                    time_array = np.append(time_array, time_list[i])
+
+                time_mean = np.mean(time_array)
+                time_std = np.std(time_array)
+                time_med = np.median(time_array)
+                results, bin_edges = np.histogram(angle_array,
+                                                  bins='auto',
+                                                  density=True)
+                time_points = bin_edges + np.mean(np.diff(bin_edges))/2
+                graph_out = np.vstack((time_points, results))
+                title = "%s, Mean = %6.2f, std. dev. = %6.2f, Median = %6.2f"\
+                    % (key, time_mean, time_std, time_med)
+                dat_name = os.path.join(self.plot_dir,
+                                        '%s_runduration_hist.dat' % (key))
+                gp.s(graph_out, dat_name)
+                plot_string = 'plot "%s" u 1:2 with points title "%s"'\
+                    % (dat_name, title)
+                gp.c(plot_string)
+                amalg_dat_name.append(dat_name)
+                amalg_titles.append('title "%s" noenhanced' % (title))
+                print("Completed %s \t Run duration" % (key))
+            amalg_formatting = 'u 1:2 with points'
+            amalg_plot_string = plotStringMultiFile(len(amalg_dat_name),
+                                                    amalg_dat_name,
+                                                    amalg_formatting,
+                                                    amalg_titles)
+            output = os.path.join(self.graph_dir, 'run_duration_amalg.png')
+            gp.c('set output "%s"' % (output))
+            g_title = 'Analysis of Run duration'
+            gp.c('set title "%s"' % (g_title))
+            gp.c('set xrange [*:*]')
+            gp.c(amalg_plot_string)
+
+            gp.c('reset')
+            gp.c('set key top left')
+            gp.c("set terminal pngcairo enhanced"
+                 + " size 1600,1200 font 'ariel, 14'")
+            gp.c('set logscale y')
+            gp.c('set ylabel "Probability Density"')
+            gp.c('set xlabel "Tumble Duration (s)"')
+            gp.c('set xrange [*:*]')
+            amalg_dat_name = []
+            amalg_titles = []
+            for key in self.bacteria.bacterium.keys():
+                print("Started %s \t Run durations" % (key))
+
+                output = os.path.join(self.graph_dir,
+                                      '%s_tumble_duration.png' % (key))
+                gp.c('set output "%s"' % (output))
+                title = 'Analysis of Tumble duration - %s'\
+                    % (key)
+                gp.c('set title "%s" noenhanced' % (title))
+                time_list = parallel(delayed(Analysis.GetTimes)
+                                     (self.bacteria.tumble_log[key][bact],
+                                      self.bacteria.config[key][bact])
+                                     for bact in
+                                     self.bacteria.run_log[key].keys())
+                time_array = []
+                for i in range(len(time_list)):
+                    time_array = np.append(time_array, time_list[i])
+
+                time_mean = np.mean(time_array)
+                time_std = np.std(time_array)
+                time_med = np.median(time_array)
+                results, bin_edges = np.histogram(angle_array,
+                                                  bins='auto',
+                                                  density=True)
+                time_points = bin_edges + np.mean(np.diff(bin_edges))/2
+                graph_out = np.vstack((time_points, results))
+                title = "%s, Mean = %6.2f, std. dev. = %6.2f, Median = %6.2f"\
+                    % (key, time_mean, time_std, time_med)
+                dat_name = os.path.join(self.plot_dir,
+                                        '%s_tumbleduration_hist.dat' % (key))
+                gp.s(graph_out, dat_name)
+                plot_string = 'plot "%s" u 1:2 with points title "%s"'\
+                    % (dat_name, title)
+                gp.c(plot_string)
+                amalg_dat_name.append(dat_name)
+                amalg_titles.append('title "%s" noenhanced' % (title))
+                print("Completed %s \t Tumble duration" % (key))
+            amalg_formatting = 'u 1:2 with points'
+            amalg_plot_string = plotStringMultiFile(len(amalg_dat_name),
+                                                    amalg_dat_name,
+                                                    amalg_formatting,
+                                                    amalg_titles)
+            output = os.path.join(self.graph_dir, 'tumble_duration_amalg.png')
+            gp.c('set output "%s"' % (output))
+            g_title = 'Analysis of Tumble duration'
+            gp.c('set title "%s"' % (g_title))
+            gp.c('set xrange [*:*]')
+            gp.c(amalg_plot_string)
+
