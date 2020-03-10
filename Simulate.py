@@ -128,7 +128,8 @@ class Bacterium:
         if self.vars.run_behaviour is True:
 
             while self.elapsed_time < self.vars.sample_total:
-
+                print("State: %s %\t Elapsed Time: %d" % (self.state,
+                                                          self.elapsed_time))
                 # %% Run Mode - Non Chemotactic
 
                 if self.state == 'run':
