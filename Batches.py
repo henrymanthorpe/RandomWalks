@@ -94,11 +94,9 @@ def MakeBatch():
             except ValueError:
                 print('Error: Input is invalid')
                 continue
-        step_value = (stop-start)/(total_configs-1)
-        steps = ['%8.3g' % (start+(i*step_value))
-                 for i in range(total_configs)]
+        steps = np.linspace(start, stop, total_configs)
         for i in range(total_configs):
-            batch_config[i][section][key] = str(steps[i])
+            batch_config[i][section][key] = '%8.3g' % (steps[i])
         print("Values:")
         print(steps)
         continue

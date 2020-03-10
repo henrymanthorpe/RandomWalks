@@ -33,10 +33,6 @@ class Graphing:
 
     def __init__(self, bacteria, graph_dir, plot_dir, threads):
         self.bacteria = bacteria
-        self.results = {}
-        self.fit_linear = {}
-        self.stats_linear = {}
-        self.plots = {}
         self.graph_dir = graph_dir
         self.plot_dir = plot_dir
         self.threads = threads
@@ -83,8 +79,8 @@ class Graphing:
             gp.c(plot_string)
 
     def DiffusionConstants(self):
-        gp.c('reset')
         with Parallel(n_jobs=self.threads) as parallel:
+            gp.c('reset')
             gp.c('set logscale xy 10')
             gp.c('set xlabel "{/Symbol t} (s)"')
             gp.c('set ylabel "MSD (m^2)"')
@@ -102,7 +98,7 @@ class Graphing:
                     % (key)
                 gp.c('set title "%s"' % (g_title))
                 tau = Analysis.TauCalc(self.bacteria.config[key])
-                gp.c('set xrange [%f:%f]' % (tau.min()*0.75, tau.max()*0.75))
+                gp.c('set xrange [%f:%f]' % (tau.min()*0.75, tau.max()*1.25))
                 results_array = parallel(delayed(
                     Analysis.Linear)(self.bacteria.bacterium[key][bact],
                                      self.bacteria.config[key])
@@ -122,11 +118,11 @@ class Graphing:
                 mean_results = np.mean(results_array, axis=0)
                 std_dev = np.std(results_array, axis=0)
                 std_error = std_dev/np.sqrt(size)
-                self.results[key+'linear'] = np.vstack(
+                current_results = np.vstack(
                     (tau, mean_results, std_error))
                 dat_name = os.path.join(self.plot_dir,
                                         '%s_msd_lin_mean.dat' % (key))
-                gp.s(self.results[key+'linear'], dat_name)
+                gp.s(current_results, dat_name)
                 plot_string = 'plot "%s" u 1:2:3 with yerrorbars' % (dat_name)
                 plot_string = plot_string + ' title "Mean Linear MSD"'
                 gp.c(plot_string)
@@ -145,9 +141,76 @@ class Graphing:
             gp.c('set xrange [*:*]')
             gp.c(amalg_plot_string)
 
+            gp.c('reset')
+            gp.c('set xlabel "{/Symbol t} (s)"')
+            gp.c('set ylabel "MSD ({/Symbol q}^2)"')
+            gp.c('set key top left')
+            gp.c("set terminal pngcairo enhanced"
+                 + " size 1600,1200 font 'ariel, 14'")
             amalg_dat_name = []
             amalg_titles = []
+            for key in self.bacteria.bacterium.keys():
+                print('Started: %s \t Linear Analysis High Range' % (key))
+                output = os.path.join(self.graph_dir,
+                                      '%s_linear_hr.png' % (key))
+                gp.c('set output "%s"' % (output))
+                g_title = 'Analysis of Linear Mean Squared Displacement %s'\
+                    % (key)
+                gp.c('set title "%s"' % (g_title))
+                tau = Analysis.TauCalcHR(self.bacteria.config[key])
+                gp.c('set xrange [%f:%f]' % (tau.min()-5, tau.max()*+5))
+                results_array = parallel(delayed(
+                    Analysis.LinearHighRange)
+                    (self.bacteria.bacterium[key][bact],
+                     self.bacteria.config[key])
+                    for bact in self.bacteria.bacterium[key].keys())
+                size = len(results_array)
+                dat_name = os.path.join(self.plot_dir,
+                                        '%s_msd_lin_hr.dat' % (key))
+                graph_out = np.vstack((tau, results_array))
+                gp.s(graph_out, dat_name)
+                title = ['notitle' for i in range(size)]
+                plot_string = plotStringSingleFile(size, dat_name,
+                                                   'with points', title)
+                gp.c(plot_string)
+                output = os.path.join(self.graph_dir,
+                                      '%s_linear_mean_hr.png' % (key))
+                gp.c('set output "%s"' % (output))
+                mean_results = np.mean(results_array, axis=0)
+                std_dev = np.std(results_array, axis=0)
+                std_error = std_dev/np.sqrt(size)
+                current_results = np.vstack(
+                    (tau, mean_results, std_error))
+                dat_name = os.path.join(self.plot_dir,
+                                        '%s_msd_lin_mean_hr.dat' % (key))
+                gp.s(current_results, dat_name)
+                plot_string = 'plot "%s" u 1:2:3 with yerrorbars' % (dat_name)
+                plot_string = plot_string + ' title "Mean Linear MSD"'
+                gp.c(plot_string)
+                amalg_dat_name.append(dat_name)
+                amalg_titles.append('title "%s"' % (key))
+                print('Completed %s \t Linear Analysis High Range' % (key))
+            amalg_formatting = 'u 1:2:3 with yerrorlines'
+            amalg_plot_string = plotStringMultiFile(len(amalg_dat_name),
+                                                    amalg_dat_name,
+                                                    amalg_formatting,
+                                                    amalg_titles)
+            output = os.path.join(self.graph_dir, 'linear_mean_amalg_hr.png')
+            gp.c('set output "%s"' % (output))
+            g_title = 'Analysis of Linear Mean Squared Displacement'
+            gp.c('set title "%s"' % (g_title))
+            gp.c('set xrange [*:*]')
+            gp.c(amalg_plot_string)
+
+            amalg_dat_name = []
+            amalg_titles = []
+            gp.c('reset')
+            gp.c('set logscale xy 10')
+            gp.c('set xlabel "{/Symbol t} (s)"')
             gp.c('set ylabel "MSD ({/Symbol q}^2)"')
+            gp.c('set key top left')
+            gp.c("set terminal pngcairo enhanced"
+                 + " size 1600,1200 font 'ariel, 14'")
             for key in self.bacteria.bacterium.keys():
                 print("Started %s \t Rotational Analysis" % (key))
                 output = os.path.join(self.graph_dir,
@@ -157,7 +220,7 @@ class Graphing:
                     + 'Displacement - %s' % (key)
                 gp.c('set title "%s"' % (g_title))
                 tau = Analysis.TauCalc(self.bacteria.config[key])
-                gp.c('set xrange [%f:%f]' % (tau.min()*0.75, tau.max()*0.75))
+                gp.c('set xrange [%f:%f]' % (tau.min()*0.75, tau.max()*1.25))
                 results_array = parallel(delayed(
                     Analysis.Rotational)(self.bacteria.bacterium[key][bact],
                                          self.bacteria.config[key])
@@ -177,11 +240,11 @@ class Graphing:
                 mean_results = np.mean(results_array, axis=0)
                 std_dev = np.std(results_array, axis=0)
                 std_error = std_dev/np.sqrt(size)
-                self.results[key+'rotational'] = np.vstack(
+                current_results = np.vstack(
                     (tau, mean_results, std_error))
                 dat_name = os.path.join(self.plot_dir,
                                         '%s_msd_rot_mean.dat' % (key))
-                gp.s(self.results[key+'rotational'], dat_name)
+                gp.s(current_results, dat_name)
                 plot_string = 'plot "%s" u 1:2:3 with yerrorbars' % (dat_name)
                 plot_string = plot_string + ' title "Mean Rotational MSD"'
                 gp.c(plot_string)
@@ -200,6 +263,10 @@ class Graphing:
             gp.c('set xrange [*:*]')
             gp.c(amalg_plot_string)
 
+            gp.c('reset')
+            gp.c('set key top left')
+            gp.c("set terminal pngcairo enhanced"
+                 + " size 1600,1200 font 'ariel, 14'")
             gp.c('unset logscale')
             gp.c('set ylabel "Probability Density"')
             gp.c('set xlabel "Run to Run Angle (degrees)"')

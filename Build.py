@@ -14,6 +14,7 @@ import os
 import time
 from Config import Default
 from Visify import VisifyExport
+from Batches import BatchBuilder
 
 
 def main(argv):
@@ -40,11 +41,11 @@ def main(argv):
     parser.add_argument('-vis', '--visualisation', dest='vis',
                         action='store_true',
                         help='Exports data in visualisation format')
-    parser.add_argument('-b', '--batchbuild', dest='batchbuild', #
+    parser.add_argument('-b', '--batchbuild', dest='batchbuild',
                         action='store_true',
                         help='Interactively build sets of configuration'
                         + ' files from a base configuration. \n'
-                        + 'If done with -i or -o, will automatically'
+                        + 'If done with -a or -o, will automatically'
                         + 'simulate batch.')
     parser.add_argument('batches', nargs='*',
                         help='Root Directory for batch files')
@@ -57,6 +58,21 @@ def main(argv):
     if len(args.batches) == 0:
         parser.parse_args(['-h'])
         sys.exit()
+
+    if args.batchbuild:
+        if not args.importing:
+            build_args = BatchBuilder()
+        else:
+            print("Error: BatchBuilder does not work with Import")
+            print("Please use Append mode to import extra data")
+            parser.parse_args['-h']
+            sys.exit()
+        if not args.append and not args.overwrite:
+            sys.exit()
+        else:
+            for build in build_args:
+                if build not in args.batches:
+                    args.batches.append(build)
     if not args.importing:
         if args.append:
             mode = True
@@ -73,6 +89,10 @@ def main(argv):
     if args.importing:
         if not args.graph and not args.visualisation:
             print("Error: Importing data for no reason (graph/vis)")
+            parser.parse_args(['-h'])
+            sys.exit()
+        elif args.overwrite or args.append:
+            print("Error: Importing does not work with Simulation modes")
             parser.parse_args(['-h'])
             sys.exit()
     for arg in args.batches:

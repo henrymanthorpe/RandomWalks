@@ -37,6 +37,10 @@ def TauCalc(variables):
     return tau
 
 
+def TauCalcHR(variables):
+    return np.arange(10, (variables.sim_time/2)+1, 5)
+
+
 def MSD(disp, tau_i, sample_total):
     size = int(np.floor(sample_total/tau_i))
     delta = np.zeros((size, 3))
@@ -62,7 +66,6 @@ def MSD_Rot(vect, tau_i, sample_total, key):
         return angles_mean
 
 
-
 def Linear(bacterium, variables):
     linear = LoadValues(bacterium, 'displacement')
     tau = TauCalc(variables)
@@ -70,6 +73,16 @@ def Linear(bacterium, variables):
     for i in range(len(tau)):
         tau_i = int(np.round(tau[i]/variables.base_time))
         results[i] = MSD(linear, tau_i, variables.sample_total)
+    return results
+
+
+def LinearHighRange(bacterium, variables):
+    linear = LoadValues(bacterium, 'displacement')
+    tau = np.arange(10, (variables.sim_time/2)+1, 5)
+    tau_i = np.round(tau/variables.base_time).astype(int)
+    results = np.zeros(len(tau))
+    for i in range(len(tau)):
+        results[i] = MSD(linear, tau_i[i], variables.sample_total)
     return results
 
 
