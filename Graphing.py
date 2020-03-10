@@ -96,7 +96,7 @@ class Graphing:
                 gp.c('set output "%s"' % (output))
                 g_title = 'Analysis of Linear Mean Squared Displacement - %s'\
                     % (key)
-                gp.c('set title "%s noenhanced"' % (g_title))
+                gp.c('set title "%s" noenhanced' % (g_title))
                 tau = Analysis.TauCalc(self.bacteria.config[key])
                 gp.c('set xrange [%f:%f]' % (tau.min()*0.75, tau.max()*1.25))
                 results_array = parallel(delayed(

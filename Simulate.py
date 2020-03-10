@@ -218,8 +218,9 @@ class Bacterium:
                         self.elapsed_time += 1
                         elapsed_run_length += 1
 
-                        chemotactic_value = np.dot(self.vectors_cartesian[i+1],
-                                                   self.vars.chem_source)
+                        chemotactic_value = np.dot(
+                            -self.vectors_cartesian[i+1],
+                            self.vars.chem_source)
                         self.chemotactic_memory.pop(0)
                         self.chemotactic_memory.append(chemotactic_value)
                         chemotactic_factor = np.mean(self.chemotactic_memory)\
