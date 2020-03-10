@@ -350,7 +350,7 @@ class Graphing:
                 gp.c('set title "%s" noenhanced' % (title))
                 time_list = parallel(delayed(Analysis.GetTimes)
                                      (self.bacteria.run_log[key][bact],
-                                      self.bacteria.config[key][bact])
+                                      self.bacteria.config[key])
                                      for bact in
                                      self.bacteria.run_log[key].keys())
                 time_array = []
@@ -415,7 +415,7 @@ class Graphing:
                 gp.c('set title "%s" noenhanced' % (title))
                 time_list = parallel(delayed(Analysis.GetTimes)
                                      (self.bacteria.tumble_log[key][bact],
-                                      self.bacteria.config[key][bact])
+                                      self.bacteria.config[key])
                                      for bact in
                                      self.bacteria.run_log[key].keys())
                 time_array = []

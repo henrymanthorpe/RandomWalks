@@ -58,7 +58,7 @@ def SingleRun(fname, bact, traj_dir, cosine_dir, duration_dir, append):
     np.savetxt(tumble_log_name, tumble_log, fmt='%d')
     end = time.time()
     elapsed = end-start
-    print("Finished\t Config: %s \t %s \tTime taken %f s" % (
+    print("Finished Config:\t%s \t %s \tTime taken %f s" % (
         os.path.split(fname)[1], bact, elapsed))
     return [traj_name, cosine_name, run_log_name, tumble_log_name]
 
