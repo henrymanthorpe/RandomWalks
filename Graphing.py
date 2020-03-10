@@ -158,7 +158,7 @@ class Graphing:
                     % (key)
                 gp.c('set title "%s"' % (g_title))
                 tau = Analysis.TauCalcHR(self.bacteria.config[key])
-                gp.c('set xrange [%f:%f]' % (tau.min()-5, tau.max()*+5))
+                gp.c('set xrange [%f:%f]' % (tau.min()-5, tau.max()+5))
                 results_array = parallel(delayed(
                     Analysis.LinearHighRange)
                     (self.bacteria.bacterium[key][bact],
