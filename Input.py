@@ -105,37 +105,30 @@ class Variables:
             self.sample_steps_rotational = self.step_rate_rotational\
                 * self.base_time
             self.run_behaviour = self.bact.getboolean('run')
-            if self.run_behaviour is True:
-                self.run_duration_mean = self.bact.getfloat('run_mean')
-                self.run_variation = self.bact.getboolean('run_var')
-                self.run_length_mean\
-                    = int(np.round(self.run_duration_mean/self.base_time))
-                self.run_speed = self.bact.getfloat('run_speed')
-                self.run_step = self.run_speed*self.base_time
-                self.archaea_mode = self.bact.getboolean('archaea_mode')
-                self.tumble_behaviour = self.bact.getboolean('tumble')
-                if self.tumble_behaviour is True:
-                    self.tumble_duration_mean\
-                        = self.bact.getfloat('tumble_duration_mean')
-                    self.tumble_length_mean\
-                        = int(np.round(self.tumble_duration_mean
-                                       / self.base_time))
-                    self.tumble_duration_variation\
-                        = self.bact.getboolean('tumble_duration_var')
-                    self.tumble_type = self.bact.get('tumble_type')
-                    if self.tumble_type not in tumble_states:
-                        print("Error, %s is not a valid tumble mode." %
-                              (self.tumble_type))
-                        raise ValueError()
-                    self.tumble_ang_vel = np.deg2rad(self.bact.getfloat(
-                                                            'tumble_velocity'))
-                    self.tumble_ang_step = self.tumble_ang_vel*self.base_time
-                else:
-                    self.pause_variation = self.bact.getboolean('pause_var')
-                    self.pause_duration_mean = self.bact.getfloat('pause_mean')
-                    self.pause_length_mean\
-                        = int(np.round(self.pause_duration_mean
-                                       / self.base_time))
+            self.run_duration_mean = self.bact.getfloat('run_mean')
+            self.run_variation = self.bact.getboolean('run_var')
+            self.run_length_mean\
+                = int(np.round(self.run_duration_mean/self.base_time))
+            self.run_speed = self.bact.getfloat('run_speed')
+            self.run_step = self.run_speed*self.base_time
+            self.archaea_mode = self.bact.getboolean('archaea_mode',
+                                                     fallback=False)
+            self.tumble_behaviour = self.bact.getboolean('tumble')
+            self.tumble_duration_mean\
+                = self.bact.getfloat('tumble_duration_mean')
+            self.tumble_length_mean\
+                = int(np.round(self.tumble_duration_mean
+                               / self.base_time))
+            self.tumble_duration_variation\
+                = self.bact.getboolean('tumble_duration_var')
+            self.tumble_type = self.bact.get('tumble_type')
+            if self.tumble_type not in tumble_states:
+                print("Error, %s is not a valid tumble mode." %
+                      (self.tumble_type))
+                raise ValueError()
+            self.tumble_ang_vel = np.deg2rad(self.bact.getfloat(
+                                                    'tumble_velocity'))
+            self.tumble_ang_step = self.tumble_ang_vel*self.base_time
             self.chemotactic = self.chem.getboolean('chemotactic')
             self.chem_style = self.chem.get('chemotactic_style')
             if self.chem_style not in chem_styles:

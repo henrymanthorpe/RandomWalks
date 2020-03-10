@@ -274,6 +274,9 @@ class Graphing:
             amalg_titles = []
             for key in self.bacteria.bacterium.keys():
                 print("Started %s \t Run to Run angles" % (key))
+                if not self.bacteria.config[key].run_behaviour:
+                    print("%s is non-motile, ignoring" % (key))
+                    continue
                 if self.bacteria.config[key].archaea_mode:
                     print("%s  is an archaea, ignoring" % (key))
                     continue
@@ -335,6 +338,9 @@ class Graphing:
             amalg_titles = []
             for key in self.bacteria.bacterium.keys():
                 print("Started %s \t Run durations" % (key))
+                if not self.bacteria.config[key].run_behaviour:
+                    print("%s is non-motile, ignoring" % (key))
+                    continue
 
                 output = os.path.join(self.graph_dir,
                                       '%s_run_duration.png' % (key))
@@ -394,6 +400,12 @@ class Graphing:
             amalg_titles = []
             for key in self.bacteria.bacterium.keys():
                 print("Started %s \t Run durations" % (key))
+                if not self.bacteria.config[key].run_behaviour:
+                    print("%s is non-motile, ignoring" % (key))
+                    continue
+                if self.bacteria.config[key].archaea_mode:
+                    print("%s  is an archaea, ignoring" % (key))
+                    continue
 
                 output = os.path.join(self.graph_dir,
                                       '%s_tumble_duration.png' % (key))
