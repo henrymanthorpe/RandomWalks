@@ -177,7 +177,7 @@ class Bacterium:
                                 += self.vectors_cartesian[i+1]\
                                 * self.vars.run_step
 
-                            self.run.append(self.vars.sample_total
+                            self.run_log.append(self.vars.sample_total
                                             - self.elapsed_time)
                         break
 
