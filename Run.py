@@ -32,15 +32,17 @@ def SingleRun(fname, bact, traj_dir, cosine_dir, duration_dir, append):
         os.mkdir(traj_save_dir)
     if not os.path.exists(cosine_save_dir):
         os.mkdir(cosine_save_dir)
-    if not os.path.exists(traj_save_dir):
+    if not os.path.exists(duration_save_dir):
         os.mkdir(duration_save_dir)
     traj_name = os.path.join(traj_save_dir, "%s.txt" % (bact))
     cosine_name = os.path.join(cosine_save_dir, '%s.txt' % (bact))
     run_log_name = os.path.join(duration_save_dir, 'run_%s.txt' % (bact))
     tumble_log_name = os.path.join(duration_save_dir, 'tumble_%s.txt' % (bact))
-    if os.path.exists(traj_name) and os.path.exists(cosine_name) and append:
+    if os.path.exists(traj_name) and os.path.exists(cosine_name)\
+        and os.path.exists(run_log_name) and os.path.exists(tumble_log_name)\
+            and append:
         print("Value prexists, not recalulating")
-        return [traj_name, cosine_name]
+        return [traj_name, cosine_name, run_log_name, tumble_log_name]
     start = time.time()
     bacterium = Bacterium(fname)
     bacterium.Complete()
