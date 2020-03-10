@@ -94,9 +94,9 @@ class Graphing:
                 output = os.path.join(self.graph_dir,
                                       '%s_linear.png' % (key))
                 gp.c('set output "%s"' % (output))
-                g_title = 'Analysis of Linear Mean Squared Displacement %s'\
+                g_title = 'Analysis of Linear Mean Squared Displacement - %s'\
                     % (key)
-                gp.c('set title "%s"' % (g_title))
+                gp.c('set title "%s noenhanced"' % (g_title))
                 tau = Analysis.TauCalc(self.bacteria.config[key])
                 gp.c('set xrange [%f:%f]' % (tau.min()*0.75, tau.max()*1.25))
                 results_array = parallel(delayed(
@@ -127,7 +127,7 @@ class Graphing:
                 plot_string = plot_string + ' title "Mean Linear MSD"'
                 gp.c(plot_string)
                 amalg_dat_name.append(dat_name)
-                amalg_titles.append('title "%s"' % (key))
+                amalg_titles.append('title "%s" noenhanced' % (key))
                 print('Completed %s \t Linear Analysis' % (key))
             amalg_formatting = 'u 1:2:3 with yerrorlines'
             amalg_plot_string = plotStringMultiFile(len(amalg_dat_name),
@@ -156,7 +156,7 @@ class Graphing:
                 gp.c('set output "%s"' % (output))
                 g_title = 'Analysis of Linear Mean Squared Displacement %s'\
                     % (key)
-                gp.c('set title "%s"' % (g_title))
+                gp.c('set title "%s" noenhanced' % (g_title))
                 tau = Analysis.TauCalcHR(self.bacteria.config[key])
                 gp.c('set xrange [%f:%f]' % (tau.min()-5, tau.max()+5))
                 results_array = parallel(delayed(
@@ -188,7 +188,7 @@ class Graphing:
                 plot_string = plot_string + ' title "Mean Linear MSD"'
                 gp.c(plot_string)
                 amalg_dat_name.append(dat_name)
-                amalg_titles.append('title "%s"' % (key))
+                amalg_titles.append('title "%s" noenhanced' % (key))
                 print('Completed %s \t Linear Analysis High Range' % (key))
             amalg_formatting = 'u 1:2:3 with yerrorlines'
             amalg_plot_string = plotStringMultiFile(len(amalg_dat_name),
@@ -218,7 +218,7 @@ class Graphing:
                 gp.c('set output "%s"' % (output))
                 g_title = 'Analysis of Rotational Mean Squared '\
                     + 'Displacement - %s' % (key)
-                gp.c('set title "%s"' % (g_title))
+                gp.c('set title "%s" noenhanced' % (g_title))
                 tau = Analysis.TauCalc(self.bacteria.config[key])
                 gp.c('set xrange [%f:%f]' % (tau.min()*0.75, tau.max()*1.25))
                 results_array = parallel(delayed(
@@ -249,7 +249,7 @@ class Graphing:
                 plot_string = plot_string + ' title "Mean Rotational MSD"'
                 gp.c(plot_string)
                 amalg_dat_name.append(dat_name)
-                amalg_titles.append('title "%s"' % (key))
+                amalg_titles.append('title "%s" noenhanced' % (key))
                 print("Completed %s \t Rotational Analysis" % (key))
             amalg_formatting = 'u 1:2:3 with yerrorlines'
             amalg_plot_string = plotStringMultiFile(len(amalg_dat_name),
@@ -282,7 +282,7 @@ class Graphing:
                 gp.c('set output "%s"' % (output))
                 title = 'Analysis of Run to Run Angle - %s'\
                     % (key)
-                gp.c('set title "%s"' % (title))
+                gp.c('set title "%s" noenhanced' % (title))
                 angle_list = parallel(delayed(Analysis.RunRunAngles)
                                       (self.bacteria.cosines[key][bact])
                                       for bact in
@@ -309,7 +309,7 @@ class Graphing:
                     % (dat_name, title)
                 gp.c(plot_string)
                 amalg_dat_name.append(dat_name)
-                amalg_titles.append('title "%s"' % (title))
+                amalg_titles.append('title "%s" noenhanced' % (title))
                 print("Completed %s \t Run to Run angles" % (key))
             amalg_formatting = 'u 1:2 with points'
             amalg_plot_string = plotStringMultiFile(len(amalg_dat_name),
