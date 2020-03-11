@@ -81,22 +81,82 @@ def MakeBatch():
             print('%s is not a valid section')
             break
         while True:
-            try:
-                print('Enter initial and final values '
-                      + '(seperated by whitespace) ')
-                print('Initial < Final')
-                start, stop = input('>> ').split()
-                start = float(start)
-                stop = float(stop)
-                if stop-start <= 0:
-                    raise ValueError()
+            print('Enter scale choice. (linear/logarithimic/manual)')
+            user_input = input('>> ')
+            if user_input.startswith('lin'):
+                print("Linear scale selected.")
+                scale = 'linear'
                 break
-            except ValueError:
-                print('Error: Input is invalid')
+            elif user_input.startswith('log'):
+                print("Logarithmic scale selected.")
+                scale = 'logarithmic'
+                break
+            elif user_input.startswith('man'):
+                print('Manual scale selected')
+                scale = 'manual'
+                break
+            else:
+                print("Error: input of %s is invalid" % (user_input))
                 continue
-        steps = np.linspace(start, stop, total_configs)
-        for i in range(total_configs):
-            batch_config[i][section][key] = '%8.3g' % (steps[i])
+        if scale == 'linear':
+            while True:
+                try:
+                    print('Enter initial and final values. '
+                          + '(seperated by whitespace) ')
+                    print('Initial < Final')
+                    start, stop = input('>> ').split()
+                    start = float(start)
+                    stop = float(stop)
+                    if stop-start <= 0:
+                        raise ValueError()
+                    steps = np.linspace(start, stop, total_configs)
+                    break
+                except ValueError:
+                    print('Error: Input is invalid')
+                    continue
+        elif scale == 'logarithmic':
+            while True:
+                try:
+                    print("Scale = multiplier x base^(exponent) ")
+                    print('Enter multiplier value.')
+                    factor = input('>>')
+                    print('Enter base value.')
+                    base = input('>> ')
+                    print('Enter initial and final exponents. '
+                          + '(seperated by whitespace) ')
+                    print('Initial < Final')
+                    start, stop = input('>> ').split()
+                    factor = float(factor)
+                    base = float(base)
+                    start = float(start)
+                    stop = float(stop)
+                    if stop-start <= 0:
+                        raise ValueError()
+                    steps = factor *\
+                        np.logspace(start, stop, total_configs, base=base)
+                    break
+                except ValueError:
+                    print('Error: Input is invalid')
+                    continue
+        elif scale == 'manual':
+            while True:
+                print('Enter %d values (seperated by whitespace)' %
+                      (total_configs))
+                user_input = input(">> ")
+                steps = user_input.split()
+                if len(steps) == total_configs:
+                    break
+                elif len(steps) < total_configs:
+                    print('Error: User entered insufficient values')
+                elif len(steps) > total_configs:
+                    print('Error: User entered too many values')
+        if scale == 'manual':
+            for i in range(total_configs):
+                batch_config[i][section][key] = '%s' % (steps[i])
+
+        else:
+            for i in range(total_configs):
+                batch_config[i][section][key] = '%8.3g' % (steps[i])
         print("Values:")
         print(steps)
         continue

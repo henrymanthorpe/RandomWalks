@@ -55,10 +55,6 @@ def main(argv):
     if args.default:
         Default()
         sys.exit()
-    if len(args.batches) == 0:
-        parser.parse_args(['-h'])
-        sys.exit()
-
     if args.batchbuild:
         if not args.importing:
             build_args = BatchBuilder()
@@ -73,6 +69,10 @@ def main(argv):
             for build in build_args:
                 if build not in args.batches:
                     args.batches.append(build)
+    if len(args.batches) == 0:
+        parser.parse_args(['-h'])
+        sys.exit()
+
     if not args.importing:
         if args.append:
             mode = True

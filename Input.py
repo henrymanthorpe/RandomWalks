@@ -47,7 +47,7 @@ class Variables:
             self.viscosity = self.env.get('viscosity')
             self.temperature = self.env.getfloat('temp')
             if self.viscosity == 'water':
-                if 273.0 < self.temperature < 373.0:
+                if 273.0 <= self.temperature <= 373.0:
                     self.viscosity = waterViscosityPoling(self.temperature)
                 else:
                     print("Error: Temperature outside of valid range.")
