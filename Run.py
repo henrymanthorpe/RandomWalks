@@ -19,7 +19,7 @@ except ImportError:
 
 
 def SingleRun(fname, bact, traj_dir, cosine_dir, duration_dir, append):
-    print("Started Config:\t%s \t %s \t" % (os.path.split(fname)[1], bact))
+    print("Started Config :\t%s \t %s \t" % (os.path.split(fname)[1], bact))
     traj_save_dir = os.path.join(traj_dir,
                                  os.path.splitext(os.path.split(fname)[1])[0])
     cosine_save_dir = os.path.join(cosine_dir,
