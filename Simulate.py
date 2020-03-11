@@ -120,8 +120,6 @@ class Bacterium:
         else:
             self.state = 'run'
         self.elapsed_time = 0
-        p = 0  # Run Counter
-        q = 0  # Tumble Counter
         self.run_log = []
         self.tumble_log = []  # Logs Run&Tumble Behaviour
         self.run_run_cosines = []
@@ -133,7 +131,6 @@ class Bacterium:
                 # %% Run Mode - Non Chemotactic
 
                 if self.state == 'run':
-                    q += 1
 
                     if self.vars.run_variation is True:
                         current_run_length = int(np.ceil(
@@ -143,48 +140,34 @@ class Bacterium:
                     else:
                         current_run_length = self.vars.run_length_mean
 
-                    if self.elapsed_time + current_run_length\
-                            < self.vars.sample_total:
+                    elapsed_run_length = 0
 
-                        for i in range(self.elapsed_time,
-                                       self.elapsed_time + current_run_length):
+                    while elapsed_run_length < current_run_length:
+                        if self.elapsed_time >= self.vars.sample_total:
+                            break
+                        i = self.elapsed_time
+                        self.vectors_cartesian[i+1]\
+                            = Tumble(self.diffusion_sample[i],
+                                     self.spin_sample[i],
+                                     self.vectors_cartesian[i])
 
-                            self.vectors_cartesian[i+1]\
-                                = Tumble(self.diffusion_sample[i],
-                                         self.spin_sample[i],
-                                         self.vectors_cartesian[i])
+                        self.displacement[i+1]\
+                            += self.vectors_cartesian[i+1]\
+                            * self.vars.run_step
 
-                            self.displacement[i+1]\
-                                += self.vectors_cartesian[i+1]\
-                                * self.vars.run_step
+                        self.elapsed_time += 1
+                        elapsed_run_length += 1
 
-                        self.elapsed_time += current_run_length
-                        self.run_log.append(current_run_length)
-                        if self.vars.archaea_mode:
-                            self.state = 'reverse'
-                        else:
-                            self.state = self.vars.tumble_type
+                    self.run_log.append(elapsed_run_length)
+
+                    if self.vars.archaea_mode:
+                        self.state = 'reverse'
                     else:
-                        for i in range(self.elapsed_time,
-                                       self.vars.sample_total):
-
-                            self.vectors_cartesian[i+1] = Tumble(
-                                self.diffusion_sample[i],
-                                self.spin_sample[i],
-                                self.vectors_cartesian[i])
-
-                            self.displacement[i+1]\
-                                += self.vectors_cartesian[i+1]\
-                                * self.vars.run_step
-
-                            self.run_log.append(self.vars.sample_total
-                                            - self.elapsed_time)
-                        break
+                        self.state = self.vars.tumble_type
 
                 # %% Run Mode - Chemotactic
 
                 elif self.state == 'run_chemotactic':
-                    q += 1
 
                     if self.vars.run_variation is True:
                         current_run_length = int(np.ceil(
@@ -239,8 +222,7 @@ class Bacterium:
 
                 # %% Reverse Mode - For Archaea
 
-                elif self.state == 'reverse':  # Archaea Reverse Mode
-                    p += 1
+                elif self.state == 'reverse':
 
                     if self.vars.run_variation is True:
                         current_run_length = int(np.ceil(
@@ -250,45 +232,31 @@ class Bacterium:
                     else:
                         current_run_length = self.vars.run_length_mean
 
-                    if self.elapsed_time + current_run_length\
-                            < self.vars.sample_total:
+                    elapsed_run_length = 0
 
-                        for i in range(self.elapsed_time,
-                                       self.elapsed_time + current_run_length):
+                    while elapsed_run_length < current_run_length:
+                        if self.elapsed_time >= self.vars.sample_total:
+                            break
+                        i = self.elapsed_time
+                        self.vectors_cartesian[i+1]\
+                            = Tumble(self.diffusion_sample[i],
+                                     self.spin_sample[i],
+                                     self.vectors_cartesian[i])
 
-                            self.vectors_cartesian[i+1]\
-                                = Tumble(self.diffusion_sample[i],
-                                         self.spin_sample[i],
-                                         self.vectors_cartesian[i])
+                        self.displacement[i+1]\
+                            += self.vectors_cartesian[i+1]\
+                            * -self.vars.run_step
 
-                            self.displacement[i+1]\
-                                += self.vectors_cartesian[i+1]\
-                                * -self.vars.run_step
+                        self.elapsed_time += 1
+                        elapsed_run_length += 1
 
-                        self.elapsed_time += current_run_length
-                        self.run_log.append(current_run_length)
-                        self.state = 'run'
-                    else:
-                        for i in range(self.elapsed_time,
-                                       self.vars.sample_total):
+                    self.run_log.append(elapsed_run_length)
 
-                            self.vectors_cartesian[i+1] = Tumble(
-                                self.diffusion_sample[i],
-                                self.spin_sample[i],
-                                self.vectors_cartesian[i])
-
-                            self.displacement[i+1]\
-                                += self.vectors_cartesian[i+1]\
-                                * self.vars.run_step
-
-                            self.run_log.append(
-                                self.vars.sample_total - self.elapsed_time)
-                        break
+                    self.state = 'run'
 
                 # %% Reverse Mode - For Chemotactic archaea
 
                 elif self.state == 'reverse_chemotactic':
-                    q += 1
 
                     if self.vars.run_variation is True:
                         current_run_length = int(np.ceil(
@@ -340,7 +308,7 @@ class Bacterium:
                 # %% Erratic Tumble Mode
 
                 elif self.state == 'erratic':
-                    q += 1
+
                     if self.vars.tumble_duration_mean == 0:
                         current_tumble_length = 0
 
@@ -390,7 +358,7 @@ class Bacterium:
                 # %% Smooth Tumble Mode
 
                 elif self.state == 'smooth':
-                    q += 1
+
                     if self.vars.tumble_duration_mean == 0:
                         current_tumble_length = 0
 
@@ -442,7 +410,7 @@ class Bacterium:
                 # %% Pause Tumble Mode
 
                 elif self.state == 'pause':
-                    q += 1
+
 
                     if self.vars.tumble_duration_mean == 0:
                         current_tumble_length = 0

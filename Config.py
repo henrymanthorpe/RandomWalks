@@ -11,7 +11,9 @@ import configparser
 
 def Default(save_dir='', verb=True):
     default_config = """
-# Default Configuration File
+# Simulation Configuration File
+
+# DO NOT use an underscore in the file name, it will break importing later.
 
 [phys]
 # Bacteria Physical Variables
