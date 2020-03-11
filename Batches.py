@@ -75,11 +75,11 @@ def MakeBatch():
                                                          initial_config
                                                          [section][key]))
             else:
-                print('%s is not a valid key.')
-                break
+                print('%s is not a valid key.' % (key))
+                continue
         else:
-            print('%s is not a valid section')
-            break
+            print('%s is not a valid section' % (section))
+            continue
         while True:
             print('Enter scale choice. (linear/logarithimic/manual)')
             user_input = input('>> ')

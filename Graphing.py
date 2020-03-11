@@ -315,16 +315,18 @@ class Graphing:
                 amalg_titles.append('title "%s" noenhanced' % (title))
                 print("Completed %s \t Run to Run angles" % (key))
             amalg_formatting = 'u 1:2 with points'
-            amalg_plot_string = plotStringMultiFile(len(amalg_dat_name),
-                                                    amalg_dat_name,
-                                                    amalg_formatting,
-                                                    amalg_titles)
-            output = os.path.join(self.graph_dir, 'run_run_angle_amalg.png')
-            gp.c('set output "%s"' % (output))
-            g_title = 'Analysis of Run to Run Angles'
-            gp.c('set title "%s"' % (g_title))
-            gp.c('set xrange [*:*]')
-            gp.c(amalg_plot_string)
+            if amalg_dat_name:
+                amalg_plot_string = plotStringMultiFile(len(amalg_dat_name),
+                                                        amalg_dat_name,
+                                                        amalg_formatting,
+                                                        amalg_titles)
+                output = os.path.join(self.graph_dir,
+                                      'run_run_angle_amalg.png')
+                gp.c('set output "%s"' % (output))
+                g_title = 'Analysis of Run to Run Angles'
+                gp.c('set title "%s"' % (g_title))
+                gp.c('set xrange [*:*]')
+                gp.c(amalg_plot_string)
 
             gp.c('reset')
             gp.c('set key top left')
@@ -377,17 +379,18 @@ class Graphing:
                 amalg_dat_name.append(dat_name)
                 amalg_titles.append('title "%s" noenhanced' % (title))
                 print("Completed %s \t Run duration" % (key))
-            amalg_formatting = 'u 1:2 with points'
-            amalg_plot_string = plotStringMultiFile(len(amalg_dat_name),
-                                                    amalg_dat_name,
-                                                    amalg_formatting,
-                                                    amalg_titles)
-            output = os.path.join(self.graph_dir, 'run_duration_amalg.png')
-            gp.c('set output "%s"' % (output))
-            g_title = 'Analysis of Run duration'
-            gp.c('set title "%s"' % (g_title))
-            gp.c('set xrange [*:*]')
-            gp.c(amalg_plot_string)
+            if amalg_dat_name:
+                amalg_formatting = 'u 1:2 with points'
+                amalg_plot_string = plotStringMultiFile(len(amalg_dat_name),
+                                                        amalg_dat_name,
+                                                        amalg_formatting,
+                                                        amalg_titles)
+                output = os.path.join(self.graph_dir, 'run_duration_amalg.png')
+                gp.c('set output "%s"' % (output))
+                g_title = 'Analysis of Run duration'
+                gp.c('set title "%s"' % (g_title))
+                gp.c('set xrange [*:*]')
+                gp.c(amalg_plot_string)
 
             gp.c('reset')
             gp.c('set key top left')
@@ -444,14 +447,16 @@ class Graphing:
                 amalg_titles.append('title "%s" noenhanced' % (title))
                 print("Completed %s \t Tumble duration" % (key))
             amalg_formatting = 'u 1:2 with points'
-            amalg_plot_string = plotStringMultiFile(len(amalg_dat_name),
-                                                    amalg_dat_name,
-                                                    amalg_formatting,
-                                                    amalg_titles)
-            output = os.path.join(self.graph_dir, 'tumble_duration_amalg.png')
-            gp.c('set output "%s"' % (output))
-            g_title = 'Analysis of Tumble duration'
-            gp.c('set title "%s"' % (g_title))
-            gp.c('set xrange [*:*]')
-            gp.c(amalg_plot_string)
+            if amalg_dat_name:
+                amalg_plot_string = plotStringMultiFile(len(amalg_dat_name),
+                                                        amalg_dat_name,
+                                                        amalg_formatting,
+                                                        amalg_titles)
+                output = os.path.join(self.graph_dir,
+                                      'tumble_duration_amalg.png')
+                gp.c('set output "%s"' % (output))
+                g_title = 'Analysis of Tumble duration'
+                gp.c('set title "%s"' % (g_title))
+                gp.c('set xrange [*:*]')
+                gp.c(amalg_plot_string)
 

@@ -16,7 +16,7 @@ def waterViscosityPoling(T):
     B = 4209
     C = 0.04527
     D = -3.376e-5
-    return A*np.exp((B/T)+C*T+D*T**2)*1e3
+    return A*np.exp((B/T)+C*T+D*T**2)*1e-3
 
 
 class Variables:
@@ -47,7 +47,7 @@ class Variables:
             self.viscosity = self.env.get('viscosity')
             self.temperature = self.env.getfloat('temp')
             if self.viscosity == 'water':
-                if 273.0 <= self.temperature <= 373.0:
+                if 272.9 < self.temperature <= 373.0:
                     self.viscosity = waterViscosityPoling(self.temperature)
                 else:
                     print("Error: Temperature outside of valid range.")
