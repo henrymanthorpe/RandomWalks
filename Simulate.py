@@ -411,7 +411,6 @@ class Bacterium:
 
                 elif self.state == 'pause':
 
-
                     if self.vars.tumble_duration_mean == 0:
                         current_tumble_length = 0
 

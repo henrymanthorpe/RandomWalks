@@ -86,22 +86,24 @@ class Graphing:
             gp.c('set ylabel "MSD (m^2)"')
             gp.c('set key top left')
             gp.c("set terminal pngcairo enhanced"
-                  + " size 1600,1200 font 'ariel, 14'")
+                 + " size 1600,1200 font 'ariel, 14'")
             amalg_dat_name = []
             amalg_titles = []
             for key in self.bacteria.bacterium.keys():
-                print('Started: %s \t Linear Analysis' % (key))
+                key_title = self.bacteria.config[key].name
+                print('Started: %s \t Linear Analysis' % (key_title))
+
                 output = os.path.join(self.graph_dir,
                                       '%s_linear.png' % (key))
                 gp.c('set output "%s"' % (output))
                 g_title = 'Analysis of Linear Mean Squared Displacement - %s'\
-                    % (key)
-                gp.c('set title "%s" noenhanced' % (g_title))
+                    % (key_title)
+                gp.c('set title "%s"' % (g_title))
                 tau = Analysis.TauCalc(self.bacteria.config[key])
                 gp.c('set xrange [%f:%f]' % (tau.min()*0.75, tau.max()*1.25))
                 results_array = parallel(delayed(
                     Analysis.Linear)(self.bacteria.bacterium[key][bact],
-                                      self.bacteria.config[key])
+                                     self.bacteria.config[key])
                     for bact in self.bacteria.bacterium[key].keys())
                 size = len(results_array)
                 dat_name = os.path.join(self.plot_dir,
@@ -110,7 +112,7 @@ class Graphing:
                 gp.s(graph_out, dat_name)
                 title = ['notitle' for i in range(size)]
                 plot_string = plotStringSingleFile(size, dat_name,
-                                                    'with points', title)
+                                                   'with points', title)
                 gp.c(plot_string)
                 output = os.path.join(self.graph_dir,
                                       '%s_linear_mean.png' % (key))
@@ -127,7 +129,7 @@ class Graphing:
                 plot_string = plot_string + ' title "Mean Linear MSD"'
                 gp.c(plot_string)
                 amalg_dat_name.append(dat_name)
-                amalg_titles.append('title "%s" noenhanced' % (key))
+                amalg_titles.append('title "%s"' % (key_title))
                 print('Completed %s \t Linear Analysis' % (key))
             amalg_formatting = 'u 1:2:3 with yerrorlines'
             amalg_plot_string = plotStringMultiFile(len(amalg_dat_name),
@@ -146,23 +148,25 @@ class Graphing:
             gp.c('set ylabel "MSD (m^2)"')
             gp.c('set key top left')
             gp.c("set terminal pngcairo enhanced"
-                  + " size 1600,1200 font 'ariel, 14'")
+                 + " size 1600,1200 font 'ariel, 14'")
             amalg_dat_name = []
             amalg_titles = []
             for key in self.bacteria.bacterium.keys():
-                print('Started: %s \t Linear Analysis High Range' % (key))
+                key_title = self.bacteria.config[key].name
+                print('Started: %s \t Linear Analysis High Range'
+                      % (key_title))
                 output = os.path.join(self.graph_dir,
                                       '%s_linear_hr.png' % (key))
                 gp.c('set output "%s"' % (output))
                 g_title = 'Analysis of Linear Mean Squared Displacement %s'\
-                    % (key)
-                gp.c('set title "%s" noenhanced' % (g_title))
+                    % (key_title)
+                gp.c('set title "%s"' % (g_title))
                 tau = Analysis.TauCalcHR(self.bacteria.config[key])
                 gp.c('set xrange [%f:%f]' % (tau.min()-5, tau.max()+5))
                 results_array = parallel(delayed(
                     Analysis.LinearHighRange)
                     (self.bacteria.bacterium[key][bact],
-                      self.bacteria.config[key])
+                     self.bacteria.config[key])
                     for bact in self.bacteria.bacterium[key].keys())
                 size = len(results_array)
                 dat_name = os.path.join(self.plot_dir,
@@ -171,7 +175,7 @@ class Graphing:
                 gp.s(graph_out, dat_name)
                 title = ['notitle' for i in range(size)]
                 plot_string = plotStringSingleFile(size, dat_name,
-                                                    'with points', title)
+                                                   'with points', title)
                 gp.c(plot_string)
                 output = os.path.join(self.graph_dir,
                                       '%s_linear_mean_hr.png' % (key))
@@ -188,8 +192,9 @@ class Graphing:
                 plot_string = plot_string + ' title "Mean Linear MSD"'
                 gp.c(plot_string)
                 amalg_dat_name.append(dat_name)
-                amalg_titles.append('title "%s" noenhanced' % (key))
-                print('Completed %s \t Linear Analysis High Range' % (key))
+                amalg_titles.append('title "%s" ' % (key_title))
+                print('Completed %s \t Linear Analysis High Range'
+                      % (key_title))
             amalg_formatting = 'u 1:2:3 with yerrorlines'
             amalg_plot_string = plotStringMultiFile(len(amalg_dat_name),
                                                     amalg_dat_name,
@@ -210,8 +215,9 @@ class Graphing:
             gp.c('set ylabel "MSD ({/Symbol q}^2)"')
             gp.c('set key top left')
             gp.c("set terminal pngcairo enhanced"
-                  + " size 1600,1200 font 'ariel, 14'")
+                 + " size 1600,1200 font 'ariel, 14'")
             for key in self.bacteria.bacterium.keys():
+                key_title = self.bacteria.config[key].name
                 print("Started %s \t Rotational Analysis" % (key))
                 output = os.path.join(self.graph_dir,
                                       '%s_rotational.png' % (key))
@@ -223,7 +229,7 @@ class Graphing:
                 gp.c('set xrange [%f:%f]' % (tau.min()*0.75, tau.max()*1.25))
                 results_array = parallel(delayed(
                     Analysis.Rotational)(self.bacteria.bacterium[key][bact],
-                                          self.bacteria.config[key])
+                                         self.bacteria.config[key])
                     for bact in self.bacteria.bacterium[key].keys())
                 size = len(results_array)
                 dat_name = os.path.join(self.plot_dir,
@@ -232,7 +238,7 @@ class Graphing:
                 gp.s(graph_out, dat_name)
                 title = ['notitle' for i in range(size)]
                 plot_string = plotStringSingleFile(size, dat_name,
-                                                    'with points', title)
+                                                   'with points', title)
                 gp.c(plot_string)
                 output = os.path.join(self.graph_dir,
                                       '%s_rotational_mean.png' % (key))
@@ -249,7 +255,7 @@ class Graphing:
                 plot_string = plot_string + ' title "Mean Rotational MSD"'
                 gp.c(plot_string)
                 amalg_dat_name.append(dat_name)
-                amalg_titles.append('title "%s" noenhanced' % (key))
+                amalg_titles.append('title "%s"' % (key_title))
                 print("Completed %s \t Rotational Analysis" % (key))
             amalg_formatting = 'u 1:2:3 with yerrorlines'
             amalg_plot_string = plotStringMultiFile(len(amalg_dat_name),
@@ -266,13 +272,14 @@ class Graphing:
             gp.c('reset')
             gp.c('set key top left')
             gp.c("set terminal pngcairo enhanced"
-                  + " size 1600,1200 font 'ariel, 14'")
+                 + " size 1600,1200 font 'ariel, 14'")
             gp.c('unset logscale')
             gp.c('set ylabel "Probability Density"')
             gp.c('set xlabel "Run to Run Angle (degrees)"')
             amalg_dat_name = []
             amalg_titles = []
             for key in self.bacteria.bacterium.keys():
+                key_title = self.bacteria.config[key].name
                 print("Started %s \t Run to Run angles" % (key))
                 if not self.bacteria.config[key].run_behaviour:
                     print("%s is non-motile, ignoring" % (key))
@@ -285,7 +292,7 @@ class Graphing:
                 gp.c('set output "%s"' % (output))
                 title = 'Analysis of Run to Run Angle - %s'\
                     % (key)
-                gp.c('set title "%s" noenhanced' % (title))
+                gp.c('set title "%s"' % (title))
                 angle_list = parallel(delayed(Analysis.RunRunAngles)
                                       (self.bacteria.cosines[key][bact])
                                       for bact in
@@ -304,7 +311,7 @@ class Graphing:
                 angle_points = np.arange(0, 180, 5) + 2.5
                 graph_out = np.vstack((angle_points, results))
                 title = "%s, Mean = %6.2f, std. dev. = %6.2f, Median = %6.2f"\
-                    % (key, angle_mean, angle_std, angle_med)
+                    % (key_title, angle_mean, angle_std, angle_med)
                 dat_name = os.path.join(self.plot_dir,
                                         '%s_run_hist.dat' % (key))
                 gp.s(graph_out, dat_name)
@@ -312,7 +319,7 @@ class Graphing:
                     % (dat_name, title)
                 gp.c(plot_string)
                 amalg_dat_name.append(dat_name)
-                amalg_titles.append('title "%s" noenhanced' % (title))
+                amalg_titles.append('title "%s"' % (title))
                 print("Completed %s \t Run to Run angles" % (key))
             amalg_formatting = 'u 1:2 with points'
             if amalg_dat_name:
@@ -339,6 +346,7 @@ class Graphing:
             amalg_dat_name = []
             amalg_titles = []
             for key in self.bacteria.bacterium.keys():
+                key_title = self.bacteria.config[key].name
                 print("Started %s \t Run durations" % (key))
                 if not self.bacteria.config[key].run_behaviour:
                     print("%s is non-motile, ignoring" % (key))
@@ -349,7 +357,7 @@ class Graphing:
                 gp.c('set output "%s"' % (output))
                 title = 'Analysis of Run duration - %s'\
                     % (key)
-                gp.c('set title "%s" noenhanced' % (title))
+                gp.c('set title "%s"' % (title))
                 time_list = parallel(delayed(Analysis.GetTimes)
                                      (self.bacteria.run_log[key][bact],
                                       self.bacteria.config[key])
@@ -369,7 +377,7 @@ class Graphing:
                     np.diff(bin_edges))/2, -1)
                 graph_out = np.vstack((time_points, results))
                 title = "%s, Mean = %6.2f, std. dev. = %6.2f, Median = %6.2f"\
-                    % (key, time_mean, time_std, time_med)
+                    % (key_title, time_mean, time_std, time_med)
                 dat_name = os.path.join(self.plot_dir,
                                         '%s_runduration_hist.dat' % (key))
                 gp.s(graph_out, dat_name)
@@ -377,7 +385,7 @@ class Graphing:
                     % (dat_name, title)
                 gp.c(plot_string)
                 amalg_dat_name.append(dat_name)
-                amalg_titles.append('title "%s" noenhanced' % (title))
+                amalg_titles.append('title "%s"' % (title))
                 print("Completed %s \t Run duration" % (key))
             if amalg_dat_name:
                 amalg_formatting = 'u 1:2 with points'
@@ -403,6 +411,7 @@ class Graphing:
             amalg_dat_name = []
             amalg_titles = []
             for key in self.bacteria.bacterium.keys():
+                key_title = self.bacteria.config[key].name
                 print("Started %s \t Tumble durations" % (key))
                 if not self.bacteria.config[key].run_behaviour:
                     print("%s is non-motile, ignoring" % (key))
@@ -415,8 +424,8 @@ class Graphing:
                                       '%s_tumble_duration.png' % (key))
                 gp.c('set output "%s"' % (output))
                 title = 'Analysis of Tumble duration - %s'\
-                    % (key)
-                gp.c('set title "%s" noenhanced' % (title))
+                    % (key_title)
+                gp.c('set title "%s"' % (title))
                 time_list = parallel(delayed(Analysis.GetTimes)
                                      (self.bacteria.tumble_log[key][bact],
                                       self.bacteria.config[key])
@@ -436,7 +445,7 @@ class Graphing:
                     np.diff(bin_edges))/2, -1)
                 graph_out = np.vstack((time_points, results))
                 title = "%s, Mean = %6.2f, std. dev. = %6.2f, Median = %6.2f"\
-                    % (key, time_mean, time_std, time_med)
+                    % (key_title, time_mean, time_std, time_med)
                 dat_name = os.path.join(self.plot_dir,
                                         '%s_tumbleduration_hist.dat' % (key))
                 gp.s(graph_out, dat_name)
@@ -444,7 +453,7 @@ class Graphing:
                     % (dat_name, title)
                 gp.c(plot_string)
                 amalg_dat_name.append(dat_name)
-                amalg_titles.append('title "%s" noenhanced' % (title))
+                amalg_titles.append('title "%s"' % (title))
                 print("Completed %s \t Tumble duration" % (key))
             amalg_formatting = 'u 1:2 with points'
             if amalg_dat_name:
@@ -459,4 +468,3 @@ class Graphing:
                 gp.c('set title "%s"' % (g_title))
                 gp.c('set xrange [*:*]')
                 gp.c(amalg_plot_string)
-

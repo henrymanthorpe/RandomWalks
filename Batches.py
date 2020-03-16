@@ -5,9 +5,8 @@ Created on Sun Feb 23 22:55:08 2020
 
 @author: henry
 """
-import sys
+
 import os
-import configparser
 import numpy as np
 from Config import GetConfig, Default
 from tempfile import TemporaryDirectory
@@ -18,7 +17,7 @@ def MakeBatch():
     batch_dir = input('>> ')
     print('Enter Batch prefix.')
     print('Warning, all configuration files with the same prefix will'
-          +' be deleted and replaced with new ones upon export.')
+          + ' be deleted and replaced with new ones upon export.')
     batch_name = input('>> ')
     config_dir = os.path.join(batch_dir, 'configs')
     if not os.path.exists(batch_dir):

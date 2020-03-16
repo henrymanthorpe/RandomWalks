@@ -8,6 +8,7 @@ Created on Fri Feb 14 22:04:35 2020
 import Config
 import numpy as np
 from scipy import constants
+import os
 import sys
 
 
@@ -30,8 +31,9 @@ class Variables:
         try:
 
             config = Config.GetConfig(fname)
-            if config.sections() == ['phys', 'env', 'time', 'bact',
+            if config.sections() == ['name', 'phys', 'env', 'time', 'bact',
                                      'chem', 'seed']:
+                self.name = config['name'].get('name')
                 self.phys = config['phys']
                 self.env = config['env']
                 self.time = config['time']
@@ -43,6 +45,8 @@ class Variables:
                 print('Please recreate options'
                       + ' from default config and try again.')
                 raise ValueError()
+            if not self.name:
+                self.name = os.path.splitext(os.path.split(fname)[1])[0]
             self.particle_mass = self.phys.getfloat('mol_mass')/avo
             self.viscosity = self.env.get('viscosity')
             self.temperature = self.env.getfloat('temp')

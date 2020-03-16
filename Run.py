@@ -114,22 +114,6 @@ class Bacteria:
         with Parallel(n_jobs=threads) as parallel:
             schedule_array = []
             digits = int(np.ceil(np.log10(repeats+1)))
-            if not append:
-                for entry in os.scandir(traj_dir):
-                    if entry.is_dir():
-                        for traj_file in os.scandir(entry):
-                            os.remove(traj_file)
-                    os.rmdir(entry)
-                for entry in os.scandir(cosine_dir):
-                    if entry.is_dir():
-                        for cosine_file in os.scandir(entry):
-                            os.remove(cosine_file)
-                    os.rmdir(entry)
-                for entry in os.scandir(duration_dir):
-                    if entry.is_dir():
-                        for duration_file in os.scandir(entry):
-                            os.remove(duration_file)
-                    os.rmdir(entry)
             for entry in os.scandir(config_dir):
                 if entry.path.endswith('.in', -3):
                     self.config[os.path.splitext(os.path.split(entry.path)

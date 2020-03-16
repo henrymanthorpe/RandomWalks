@@ -15,17 +15,24 @@ def Default(save_dir='', verb=True):
 
 # DO NOT use an underscore in the file name, it will break importing later.
 
+[name]
+
+# Name - Configuration descriptor, used to identify in Analysis graphs
+# If left blank, configuration file name will be used.
+
+name = Default Configuration
+
 [phys]
 # Bacteria Physical Variables
 
 # Molecular mass of bacteria strain (kg/mol)
-mol_mass = 15.0
+mol_mass = 3.3e18
 
 # Bacteria shape (Sphere or Ellipsoid)
 shape = Sphere
 
 # Spherical radius (if Sphere)
-radius_sphere = 1e-6
+radius_sphere = 0.5e-6
 
 # Semi-Major and Semi-Minor axis radii (if Ellipsoid)
 radius_major =
@@ -87,7 +94,7 @@ tumble_duration_var = yes
 tumble_duration_mean = 0.1
 
 # Mean Tumble Angular Velocity (degrees/sec)
-tumble_velocity = 650
+tumble_velocity = 700
 
 
 # Archaea mode - Run and Reverse
@@ -132,7 +139,7 @@ entropy =
         print("Default Config File created as 'defaultconfig.in' in %s"
               % (save_dir))
         print("Please edit the contained values "
-              +"to those required for your needs.")
+              + "to those required for your needs.")
 
 
 def GetConfig(fname):
