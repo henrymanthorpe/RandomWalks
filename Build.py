@@ -50,7 +50,6 @@ def main(argv):
     parser.add_argument('batches', nargs='*',
                         help='Root Directory for batch files')
     args = parser.parse_args()
-    print(args)
     mode = None
     if args.default:
         Default()
