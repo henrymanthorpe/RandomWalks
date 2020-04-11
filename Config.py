@@ -20,7 +20,7 @@ def Default(save_dir='', verb=True):
 # Name - Configuration descriptor, used to identify in Analysis graphs
 # If left blank, configuration file name will be used.
 
-name = Default Configuration
+name = 
 
 [phys]
 # Bacteria Physical Variables
