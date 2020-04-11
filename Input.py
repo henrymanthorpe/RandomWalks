@@ -27,6 +27,7 @@ class Variables:
         chem_styles = ['linear']
         pi = np.pi
         boltz = constants.Boltzmann
+        avo = constants.Avogadro
         try:
 
             config = Config.GetConfig(fname)
@@ -81,6 +82,11 @@ class Variables:
                 = self.temperature*boltz / self.frictional_drag_linear
             self.diffusion_constant_rotational\
                 = self.temperature*boltz / self.frictional_drag_rotational
+            self.sim_time = self.time.getfloat('sim_time')
+            self.base_time = self.time.getfloat('base_time')
+            self.sample_total = int(np.ceil(self.sim_time/self.base_time))
+            self.sim_time = self.base_time*self.sample_total
+            # Increases sim_time to include integer number of samples
             self.run_behaviour = self.bact.getboolean('run')
             self.run_duration_mean = self.bact.getfloat('run_mean')
             self.run_variation = self.bact.getboolean('run_var')
