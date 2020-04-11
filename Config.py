@@ -25,9 +25,6 @@ name = Default Configuration
 [phys]
 # Bacteria Physical Variables
 
-# Molecular mass of bacteria strain (kg/mol)
-mol_mass = 3.3e18
-
 # Bacteria shape (Sphere or Ellipsoid)
 shape = Sphere
 

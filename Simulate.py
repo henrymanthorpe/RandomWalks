@@ -63,14 +63,15 @@ class Bacterium:
         self.rand_gen = Generator(PCG64(self.seed))
 
     def Linear(self):
-        self.std_dev_linear = 2*self.vars.step_linear*np.sqrt(
-            self.vars.sample_steps_linear*0.25)
+        self.std_dev_linear = np.sqrt(2*self.vars.diffusion_constant_linear
+                                      * self.vars.base_time)
         self.linear_diffusion = np.random.normal(
             0.0, self.std_dev_linear, (self.vars.sample_total, 3))
 
     def Rotational(self):
-        self.std_dev_rotational = 2*self.vars.step_rotational\
-            * np.sqrt(self.vars.sample_steps_rotational*0.25)
+        self.std_dev_rotational\
+            = np.sqrt(2*self.vars.diffusion_constant_rotational
+                      * self.vars.base_time)
         self.rotational_sample = self.rand_gen.normal(
             0.0, self.std_dev_rotational, (2, self.vars.sample_total))
         self.diffusion_sample = np.sqrt(np.square(self.rotational_sample[0])
@@ -91,12 +92,13 @@ class Bacterium:
 
     def Complete(self):
         # Diffusion Sampling
-        self.std_dev_linear = 2*self.vars.step_linear\
-            * np.sqrt(self.vars.sample_steps_linear*0.25)
+        self.std_dev_linear = np.sqrt(2*self.vars.diffusion_constant_linear
+                                      * self.vars.base_time)
         self.linear_diffusion = self.rand_gen.normal(
             0.0, self.std_dev_linear, (self.vars.sample_total, 3))
-        self.std_dev_rotational = 2*self.vars.step_rotational\
-            * np.sqrt(self.vars.sample_steps_rotational*0.25)
+        self.std_dev_rotational\
+            = np.sqrt(2*self.vars.diffusion_constant_rotational
+                      * self.vars.base_time)
         self.rotational_sample = self.rand_gen.normal(
             0.0, self.std_dev_rotational, (2, self.vars.sample_total))
         self.diffusion_sample = np.sqrt(np.square(self.rotational_sample[0])

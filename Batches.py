@@ -102,12 +102,9 @@ def MakeBatch():
                 try:
                     print('Enter initial and final values. '
                           + '(seperated by whitespace) ')
-                    print('Initial < Final')
                     start, stop = input('>> ').split()
                     start = float(start)
                     stop = float(stop)
-                    if stop-start <= 0:
-                        raise ValueError()
                     steps = np.linspace(start, stop, total_configs)
                     break
                 except ValueError:
@@ -123,14 +120,11 @@ def MakeBatch():
                     base = input('>> ')
                     print('Enter initial and final exponents. '
                           + '(seperated by whitespace) ')
-                    print('Initial < Final')
                     start, stop = input('>> ').split()
                     factor = float(factor)
                     base = float(base)
                     start = float(start)
                     stop = float(stop)
-                    if stop-start <= 0:
-                        raise ValueError()
                     steps = factor *\
                         np.logspace(start, stop, total_configs, base=base)
                     break

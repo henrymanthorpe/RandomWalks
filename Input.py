@@ -27,7 +27,6 @@ class Variables:
         chem_styles = ['linear']
         pi = np.pi
         boltz = constants.Boltzmann
-        avo = constants.Avogadro
         try:
 
             config = Config.GetConfig(fname)
@@ -47,7 +46,6 @@ class Variables:
                 raise ValueError()
             if not self.name:
                 self.name = os.path.splitext(os.path.split(fname)[1])[0]
-            self.particle_mass = self.phys.getfloat('mol_mass')/avo
             self.viscosity = self.env.get('viscosity')
             self.temperature = self.env.getfloat('temp')
             if self.viscosity == 'water':
@@ -68,7 +66,6 @@ class Variables:
                 self.frictional_drag_linear = 6*pi*self.viscosity*self.radius
                 self.frictional_drag_rotational\
                     = 8*pi*self.viscosity*(self.radius**3)
-                self.MoI = 0.4*self.particle_mass*self.radius**2
             elif self.phys.get('shape') == 'Ellipsoid':
                 self.radius_major = self.phys.getfloat('radius_major')
                 self.radius_minor = self.phys.getfloat('radius_minor')
@@ -77,8 +74,6 @@ class Variables:
                     = 6*pi*self.viscosity*self.radius_major/q
                 self.frictional_drag_rotational\
                     = (8*pi*self.viscosity*(self.radius_major**3)/3)/(q+0.5)
-                self.MoI = 0.2*self.particle_mass*(self.radius_major**2
-                                                   + self.radius_minor**2)
             else:
                 print("Error: Shape not found")
                 raise ValueError()
@@ -86,28 +81,6 @@ class Variables:
                 = self.temperature*boltz / self.frictional_drag_linear
             self.diffusion_constant_rotational\
                 = self.temperature*boltz / self.frictional_drag_rotational
-            self.rms_velocity_linear\
-                = np.sqrt(boltz*self.temperature/self.particle_mass)
-            self.rms_velocity_rotational = np.sqrt(boltz*self.temperature
-                                                   / self.MoI)
-            self.step_linear\
-                = 2*self.diffusion_constant_linear/self.rms_velocity_linear
-            self.step_rate_linear = self.rms_velocity_linear/self.step_linear
-            self.step_time_linear = 1.0/self.step_rate_linear
-            self.sim_time = self.time.getfloat('sim_time')
-            self.base_time = self.time.getfloat('base_time')
-            self.sample_total = int(np.ceil(self.sim_time/self.base_time))
-            self.sim_time = self.base_time*self.sample_total
-            # Increases sim_time to include integer number of samples
-            self.sample_steps_linear = self.step_rate_linear*self.base_time
-            self.step_rotational\
-                = 2*self.diffusion_constant_rotational\
-                / self.rms_velocity_rotational
-            self.step_rate_rotational\
-                = self.rms_velocity_rotational/self.step_rotational
-            self.step_time_rotational = 1.0/self.step_rate_rotational
-            self.sample_steps_rotational = self.step_rate_rotational\
-                * self.base_time
             self.run_behaviour = self.bact.getboolean('run')
             self.run_duration_mean = self.bact.getfloat('run_mean')
             self.run_variation = self.bact.getboolean('run_var')
