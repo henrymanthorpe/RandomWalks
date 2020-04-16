@@ -11,6 +11,7 @@ import Analysis
 import numpy as np
 import PyGnuplot as gp
 from joblib import Parallel, delayed
+from scipy.stats import linregress
 
 
 def plotStringSingleFile(size, dat_name, formatting, title):
@@ -28,7 +29,17 @@ def plotStringMultiFile(size, dat_name, formatting, title):
             + ' "%s" %s %s,' % (dat_name[i], formatting, title[i])
     return plot_string
 
+def plotStringMultiFileWithFit(size, dat_name, formatting, title, grad,
+                               grad_title):
+    plot_string = 'plot'
+    for i in range(size):
+        plot_string = plot_string\
+            + ' "%s" %s lc %d %s,' % (dat_name[i], formatting, i, title[i])
+        plot_string = plot_string\
+            + ' %e*x lc %d title "%s",' (grad[i], i, grad_title[i])
+    return plot_string
 
+# %%
 class Graphing:
 
     def __init__(self, bacteria, graph_dir, plot_dir, threads):
@@ -80,6 +91,7 @@ class Graphing:
 
     def DiffusionConstants(self):
         with Parallel(n_jobs=self.threads) as parallel:
+# %% Linear - LogLog fullscale
             gp.c('reset')
             gp.c('set logscale xy 10')
             gp.c('set xlabel "{/Symbol t} (s)"')
@@ -143,6 +155,7 @@ class Graphing:
             gp.c('set xrange [*:*]')
             gp.c(amalg_plot_string)
 
+# %% Linear - High Range (>1 sec)
             gp.c('reset')
             gp.c('set xlabel "{/Symbol t} (s)"')
             gp.c('set ylabel "MSD (m^2)"')
@@ -151,7 +164,10 @@ class Graphing:
                  + " size 1600,1200 font 'ariel, 14'")
             amalg_dat_name = []
             amalg_titles = []
+            amalg_grad = []
+            amalg_grad_titles = []
             for key in self.bacteria.bacterium.keys():
+                line_colour = 1
                 key_title = self.bacteria.config[key].name
                 print('Started: %s \t Linear Analysis High Range'
                       % (key_title))
@@ -185,27 +201,44 @@ class Graphing:
                 std_error = std_dev/np.sqrt(size)
                 current_results = np.vstack(
                     (tau, mean_results, std_error))
+                gradient, y_intercept, r_value, p_value, grad_err\
+                    = linregress(tau, mean_results)
+                exp_diff = "Gradient = %.5e {/Symbol \261} %.5e" % (gradient,
+                                                                    grad_err)
+                r_2 = "R^2 = %f" % (r_value**2)
+                fit_title = ("%s, %s, %s") % (key_title, exp_diff, r_2)
                 dat_name = os.path.join(self.plot_dir,
                                         '%s_msd_lin_mean_hr.dat' % (key))
                 gp.s(current_results, dat_name)
-                plot_string = 'plot "%s" u 1:2:3 with yerrorbars' % (dat_name)
-                plot_string = plot_string + ' title "Mean Linear MSD"'
+                plot_string = 'plot "%s" u 1:2:3 with yerrorbars lc %d' %\
+                    (dat_name, line_colour)
+                plot_string = plot_string + ' title "%s - Mean MSD"'\
+                    % (key_title)
+                plot_string = plot_string + ', %e*x lc %d' %\
+                    (gradient, line_colour)
+                plot_string = plot_string + 'title "%s"' % (fit_title)
                 gp.c(plot_string)
                 amalg_dat_name.append(dat_name)
-                amalg_titles.append('title "%s" ' % (key_title))
+                amalg_titles.append('title "%s - Mean MSD" ' % (key_title))
+                amalg_grad.append(gradient)
+                amalg_grad_titles.append(fit_title)
                 print('Completed %s \t Linear Analysis High Range'
                       % (key_title))
-            amalg_formatting = 'u 1:2:3 with yerrorlines'
-            amalg_plot_string = plotStringMultiFile(len(amalg_dat_name),
+            amalg_formatting = 'u 1:2:3 with yerrorbars'
+            amalg_plot_string = plotStringMultiFileWithFit(len(amalg_dat_name),
                                                     amalg_dat_name,
                                                     amalg_formatting,
-                                                    amalg_titles)
+                                                    amalg_titles,
+                                                    amalg_grad,
+                                                    amalg_grad_titles)
             output = os.path.join(self.graph_dir, 'linear_mean_amalg_hr.png')
             gp.c('set output "%s"' % (output))
             g_title = 'Analysis of Linear Mean Squared Displacement'
             gp.c('set title "%s"' % (g_title))
             gp.c('set xrange [*:*]')
             gp.c(amalg_plot_string)
+
+# %% Rotational Analysis
 
             amalg_dat_name = []
             amalg_titles = []
@@ -268,6 +301,8 @@ class Graphing:
             gp.c('set title "%s"' % (g_title))
             gp.c('set xrange [*:*]')
             gp.c(amalg_plot_string)
+
+# %%
 
             gp.c('reset')
             gp.c('set key top left')
@@ -335,6 +370,7 @@ class Graphing:
                 gp.c('set xrange [*:*]')
                 gp.c(amalg_plot_string)
 
+# %%
             gp.c('reset')
             gp.c('set key top left')
             gp.c("set terminal pngcairo enhanced"
@@ -399,6 +435,8 @@ class Graphing:
                 gp.c('set title "%s"' % (g_title))
                 gp.c('set xrange [*:*]')
                 gp.c(amalg_plot_string)
+
+# %%
 
             gp.c('reset')
             gp.c('set key top left')

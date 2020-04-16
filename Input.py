@@ -27,7 +27,6 @@ class Variables:
         chem_styles = ['linear']
         pi = np.pi
         boltz = constants.Boltzmann
-        avo = constants.Avogadro
         try:
 
             config = Config.GetConfig(fname)

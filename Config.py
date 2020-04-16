@@ -82,7 +82,7 @@ run_mean = 0.9
 tumble = yes
 
 #Tumble type - smooth, erratic, pause
-tumble_type = smooth
+tumble_type = erratic
 
 #Tumble Duration Variation
 tumble_duration_var = yes
