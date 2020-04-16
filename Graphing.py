@@ -36,7 +36,7 @@ def plotStringMultiFileWithFit(size, dat_name, formatting, title, grad,
         plot_string = plot_string\
             + ' "%s" %s lc %d %s,' % (dat_name[i], formatting, i, title[i])
         plot_string = plot_string\
-            + ' %e*x lc %d title "%s",' (grad[i], i, grad_title[i])
+            + ' %e*x lc %d title "%s",' % (grad[i], i, grad_title[i])
     return plot_string
 
 # %%
