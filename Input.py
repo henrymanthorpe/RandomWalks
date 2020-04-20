@@ -91,7 +91,8 @@ class Variables:
             self.run_variation = self.bact.getboolean('run_var')
             self.run_length_mean\
                 = int(np.round(self.run_duration_mean/self.base_time))
-            self.run_speed = self.bact.getfloat('run_speed')
+            self.run_force = self.bact.getfloat('run_force')
+            self.run_speed = self.run_force / self.frictional_drag_linear
             self.run_step = self.run_speed*self.base_time
             self.archaea_mode = self.bact.getboolean('archaea_mode',
                                                      fallback=False)
@@ -108,8 +109,9 @@ class Variables:
                 print("Error, %s is not a valid tumble mode." %
                       (self.tumble_type))
                 raise ValueError()
-            self.tumble_ang_vel = np.deg2rad(self.bact.getfloat(
-                                                    'tumble_velocity'))
+            self.tumble_torque = self.bact.getfloat('tumble_torque')
+            self.tumble_ang_vel = self.tumble_torque\
+                / self.frictional_drag_rotational
             self.tumble_ang_step = self.tumble_ang_vel*self.base_time
             self.chemotactic = self.chem.getboolean('chemotactic')
             self.chem_style = self.chem.get('chemotactic_style')

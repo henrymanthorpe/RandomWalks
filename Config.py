@@ -20,7 +20,7 @@ def Default(save_dir='', verb=True):
 # Name - Configuration descriptor, used to identify in Analysis graphs
 # If left blank, configuration file name will be used.
 
-name = 
+name =
 
 [phys]
 # Bacteria Physical Variables
@@ -69,8 +69,8 @@ base_time = 5e-3
 # Run Behaviour
 run = yes
 
-# Run Speed (m/s)
-run_speed = 1.5e-5
+# Run Speed (N)
+run_force = 1.26e-13
 
 # Varying Run Duration
 run_var = yes
@@ -90,8 +90,8 @@ tumble_duration_var = yes
 #Mean Tumble Duration (s)
 tumble_duration_mean = 0.1
 
-# Mean Tumble Angular Velocity (degrees/sec)
-tumble_velocity = 700
+# Tumble Torque (Nm)
+tumble_torque = 3.42e-20
 
 
 # Archaea mode - Run and Reverse
