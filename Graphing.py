@@ -349,7 +349,7 @@ class Graphing:
                 results, bin_edges = np.histogram(angle_array,
                                                   bins=angle_bins,
                                                   density=True)
-                angle_points = angle_bins + np.diff(angle_bins)[0]/2
+                angle_points = np.delete(angle_bins, -1) + np.diff(angle_bins)/2
                 graph_out = np.vstack((angle_points, results))
                 title = "%s, Mean = %6.2f, std. dev. = %6.2f, Median = %6.2f"\
                     % (key_title, angle_mean, angle_std, angle_med)
