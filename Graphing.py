@@ -339,7 +339,7 @@ class Graphing:
                 angle_array = []
                 for i in range(len(angle_list)):
                     angle_array = np.append(angle_array, angle_list[i])
-                angle_bins = np.linspace(0, np.pi(), 40)
+                angle_bins = np.linspace(0, np.pi, 40)
                 angle_mean = np.mean(angle_array)
                 angle_std = np.std(angle_array)
                 angle_std_err = angle_std/np.sqrt(len(angle_array))
