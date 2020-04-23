@@ -11,6 +11,7 @@ from numpy.random import Generator, PCG64, SeedSequence
 from Simulate import Tumble
 import matplotlib.pyplot as plt
 from joblib import Parallel, delayed
+from Analysis import LoadDurations, LoadValues
 
 
 def MultiDist(n, mu, sigma):
@@ -65,6 +66,17 @@ def TumbleAlignmentCheck(n, t):
 
 
 
+def RunDeviationAnalysis(traj_file, run_file, tumble_file):
+    traj = LoadValues(traj_file, "displacement")
+    runs = LoadDurations(run_file)
+    tumbles = LoadDurations(tumble_file)
+    elapsed_time = 0
+    disp_array = np.zeros(tumbles.size)
+    for x in range(tumbles.size):
+        disp_curr = np.sum(traj[elapsed_time:elapsed_time+runs[x]+1])
+        disp_curr_2 = disp_curr**2
+        disp = np.sqrt(np.sum(disp_curr_2))
+        disp_array[x] = disp
+        elapsed_time = elapsed_time + runs[x] + tumbles[x]
+    return disp_array
 
-def ChemotaxisTest(v, f):
-    chem_value = v.mean()
