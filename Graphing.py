@@ -13,6 +13,7 @@ import PyGnuplot as gp
 from joblib import Parallel, delayed
 from scipy.stats import linregress
 
+        
 
 def plotStringSingleFile(size, dat_name, formatting, title):
     plot_string = 'plot'
@@ -91,6 +92,9 @@ class Graphing:
 
     def DiffusionConstants(self):
         with Parallel(n_jobs=self.threads) as parallel:
+            self.LDValues = {}
+            for key in self.bacteria.bacterium.keys():
+                self.LDValues[key] = Analysis.LDValues(self.bacteria.config[key])
 # %% Linear - LogLog fullscale
             gp.c('reset')
             gp.c('set logscale xy 10')
