@@ -18,7 +18,9 @@ class LDValues:
     def LDCalc(self):
         numer = self.run_speed**2 * self.avg_tumble
         denom = 3*(1-np.cos(self.avg_tumble))
+        self.tumble_cos_err = 3*np.sin(self.avg_tumble)*self.tumble_err
         self.LD_Diff = numer/denom
+        self.LD_err = np.sqrt((self.tumble_cos_err/np.cos(self.avg_tumble))**2+(self.run_dur_err/self.avg_run_duration)**2)*self.LD_Diff
 
 def LoadValues(fname, request):
     values = np.loadtxt(fname, delimiter='\t')

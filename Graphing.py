@@ -339,7 +339,7 @@ class Graphing:
                 angle_array = []
                 for i in range(len(angle_list)):
                     angle_array = np.append(angle_array, angle_list[i])
-                angle_bins = np.linspace(0, np.pi(), 40)
+                angle_bins = np.linspace(0, np.pi, 40)
                 angle_mean = np.mean(angle_array)
                 angle_std = np.std(angle_array)
                 angle_std_err = angle_std/np.sqrt(len(angle_array))
@@ -412,8 +412,8 @@ class Graphing:
                 time_mean = np.mean(time_array)
                 time_std = np.std(time_array)
                 time_std_err = time_std/(np.sqrt(len(time_array)))
-                self.LDValues.avg_run_duration = time_mean
-                self.LDValues.run_dur_err = time_std_err
+                self.LDValues[key].avg_run_duration = time_mean
+                self.LDValues[key].run_dur_err = time_std_err
 
                 time_med = np.median(time_array)
                 results, bin_edges = np.histogram(time_array,
@@ -516,3 +516,14 @@ class Graphing:
                 gp.c('set title "%s"' % (g_title))
                 gp.c('set xrange [*:*]')
                 gp.c(amalg_plot_string)
+            LD_file = os.path.join(self.plot_dir,"LD_values.txt")
+            with open(LD_file, "w") as LD_f:
+                for key in self.bacteria.bacterium.keys():
+                    if self.bacteria.config[key].run_behaviour:
+                        self.LDValues[key].LDCalc()
+                        write_string = "%s \t Name: %s \tLD Value: %e \t Error: %e \n"\
+                                       %    (key, self.bacteria.config[key].name,
+                                            self.LDValues[key].LD_Diff,
+                                            self.LDValues[key].LD_err)
+                        LD_f.write(write_string)
+
