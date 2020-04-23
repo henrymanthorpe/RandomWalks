@@ -95,7 +95,7 @@ class Graphing:
             self.LDValues = {}
             for key in self.bacteria.bacterium.keys():
                 self.LDValues[key] = Analysis.LDValues(self.bacteria.config[key])
-%% Linear - LogLog fullscale
+# %% Linear - LogLog fullscale
             gp.c('reset')
             gp.c('set logscale xy 10')
             gp.c('set xlabel "{/Symbol t} (s)"')
