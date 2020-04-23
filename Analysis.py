@@ -12,7 +12,9 @@ class LDValues:
     def __init__(self, variables):
         self.run_speed = variables.run_force/variables.frictional_drag_linear
         self.avg_tumble = 0.0
+        self.tumble_err = 0.0
         self.avg_run_duration = 0.0
+        self.run_dur_err = 0.0
     def LDCalc(self):
         numer = self.run_speed**2 * self.avg_tumble
         denom = 3*(1-np.cos(self.avg_tumble))

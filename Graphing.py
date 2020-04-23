@@ -339,15 +339,17 @@ class Graphing:
                 angle_array = []
                 for i in range(len(angle_list)):
                     angle_array = np.append(angle_array, angle_list[i])
-                angle_bins = np.arange(0, 181, 5)
-                angle_array = np.rad2deg(angle_array)
+                angle_bins = np.linspace(0, np.pi(), 40)
                 angle_mean = np.mean(angle_array)
                 angle_std = np.std(angle_array)
+                angle_std_err = angle_std/np.sqrt(len(angle_array))
+                self.LDValues[key].avg_tumble = angle_mean
+                self.LDValues[key].tumble_err = angle_std_err
                 angle_med = np.median(angle_array)
                 results, bin_edges = np.histogram(angle_array,
                                                   bins=angle_bins,
                                                   density=True)
-                angle_points = np.arange(0, 180, 5) + 2.5
+                angle_points = angle_bins + np.diff(angle_bins)[0]/2
                 graph_out = np.vstack((angle_points, results))
                 title = "%s, Mean = %6.2f, std. dev. = %6.2f, Median = %6.2f"\
                     % (key_title, angle_mean, angle_std, angle_med)
@@ -409,6 +411,10 @@ class Graphing:
 
                 time_mean = np.mean(time_array)
                 time_std = np.std(time_array)
+                time_std_err = time_std/(np.sqrt(len(time_array)))
+                self.LDValues.avg_run_duration = time_mean
+                self.LDValues.run_dur_err = time_std_err
+
                 time_med = np.median(time_array)
                 results, bin_edges = np.histogram(time_array,
                                                   bins='auto',
