@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+#
 # -*- coding: utf-8 -*-
 """
 Created on Fri Feb 14 22:04:35 2020
@@ -81,6 +82,7 @@ class Variables:
                 = self.temperature*boltz / self.frictional_drag_linear
             self.diffusion_constant_rotational\
                 = self.temperature*boltz / self.frictional_drag_rotational
+            self.diffusive = self.bact.getboolean("diffusive")
             self.sim_time = self.time.getfloat('sim_time')
             self.base_time = self.time.getfloat('base_time')
             self.sample_total = int(np.ceil(self.sim_time/self.base_time))

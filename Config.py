@@ -64,6 +64,10 @@ base_time = 5e-3
 # and produces ~ 11MB of trajectory data per repeat
 
 [bact]
+# Diffusion Behaviour - Turn off to remove all Brownian motion effects
+
+diffusive = yes
+
 # Run-Tumble Variables
 
 # Run Behaviour
@@ -91,7 +95,7 @@ tumble_duration_var = yes
 tumble_duration_mean = 0.1
 
 # Tumble Torque (Nm)
-tumble_torque = 3.42e-20
+tumble_torque = 2e-19
 
 
 # Archaea mode - Run and Reverse
