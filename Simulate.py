@@ -153,7 +153,7 @@ class Bacterium:
                         if self.elapsed_time >= self.vars.sample_total:
                             break
                         i = self.elapsed_time
-                        if self.var.diffusive:
+                        if self.vars.diffusive:
                             self.vectors_cartesian[i+1]\
                                 = Tumble(self.diffusion_sample[i],
                                          self.spin_sample[i],
@@ -199,7 +199,7 @@ class Bacterium:
                         if self.elapsed_time >= self.vars.sample_total:
                             break
                         i = self.elapsed_time
-                        if self.var.diffusive:
+                        if self.vars.diffusive:
                             self.vectors_cartesian[i + 1] \
                                 = Tumble(self.diffusion_sample[i],
                                          self.spin_sample[i],
@@ -251,7 +251,7 @@ class Bacterium:
                         if self.elapsed_time >= self.vars.sample_total:
                             break
                         i = self.elapsed_time
-                        if self.var.diffusive:
+                        if self.vars.diffusive:
                             self.vectors_cartesian[i + 1] \
                                 = Tumble(self.diffusion_sample[i],
                                          self.spin_sample[i],
@@ -294,7 +294,7 @@ class Bacterium:
                         if self.elapsed_time >= self.vars.sample_total:
                             break
                         i = self.elapsed_time
-                        if self.var.diffusive:
+                        if self.vars.diffusive:
                             self.vectors_cartesian[i + 1] \
                                 = Tumble(self.diffusion_sample[i],
                                          self.spin_sample[i],
@@ -347,7 +347,7 @@ class Bacterium:
                                        self.elapsed_time
                                        + current_tumble_length):
 
-                            if self.var.diffusive:
+                            if self.vars.diffusive:
                                 self.vectors_cartesian[i + 1] \
                                     = Tumble(self.diffusion_sample[i],
                                              self.spin_sample[i],
@@ -400,7 +400,7 @@ class Bacterium:
                                        self.elapsed_time
                                        + current_tumble_length):
 
-                            if self.var.diffusive:
+                            if self.vars.diffusive:
                                 self.vectors_cartesian[i + 1] \
                                     = Tumble(self.diffusion_sample[i],
                                              self.spin_sample[i],
@@ -455,7 +455,7 @@ class Bacterium:
                                        self.elapsed_time
                                        + current_tumble_length):
 
-                            if self.var.diffusive:
+                            if self.vars.diffusive:
                                 self.vectors_cartesian[i + 1] \
                                     = Tumble(self.diffusion_sample[i],
                                              self.spin_sample[i],
@@ -493,7 +493,7 @@ class Bacterium:
         else:
             for i in range(self.elapsed_time,
                            self.vars.sample_total):
-                if self.var.diffusive:
+                if self.vars.diffusive:
                     self.vectors_cartesian[i + 1] \
                         = Tumble(self.diffusion_sample[i],
                                  self.spin_sample[i],
