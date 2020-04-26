@@ -1,2 +1,0 @@
-# RandomWalks
-MPhys Project
