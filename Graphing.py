@@ -484,6 +484,7 @@ class Graphing:
                     time_array = np.append(time_array, time_list[i])
 
                 time_mean = np.mean(time_array)
+                self.LDValues[key].avg_tumble_duration = time_mean
                 time_std = np.std(time_array)
                 time_med = np.median(time_array)
                 results, bin_edges = np.histogram(time_array,
