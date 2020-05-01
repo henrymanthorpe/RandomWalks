@@ -10,7 +10,7 @@ import os
 
 class LDValues:
     def __init__(self, variables):
-        if not variables.run_behaviour or variables.archaea_mode:
+        if not variables.run_behaviour:
             self.LD = False
             return
         else:
@@ -22,7 +22,10 @@ class LDValues:
         if self.diffusive:
             alpha = np.sqrt(4*self.diff_rot*self.simstep)
             self.tau_B = self.simstep/(1-np.cos(alpha))
-        self.avg_tumble = 0.0 # Values for these are set during analysis sequence
+        if variables.archaea_mode:
+            self.avg_tumble = np.pi
+        else:
+            self.avg_tumble = 0.0 # Values for these are set during analysis sequence
         self.avg_run_duration = 0.0
         self.avg_tumble_duration = 0.0
         self.tau_A = 0.0
