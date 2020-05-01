@@ -524,6 +524,6 @@ class Graphing:
                         self.LDValues[key].LDCalc()
                         write_string = "%s \t Name: %s \tLD Value: %e\n"\
                                        %    (key, self.bacteria.config[key].name,
-                                            self.LDValues[key].LD_Diff
+                                            self.LDValues[key].LD_Diff)
                         LD_f.write(write_string)
 
