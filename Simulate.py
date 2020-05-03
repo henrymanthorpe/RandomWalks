@@ -49,7 +49,7 @@ class Bacterium:
         self.vars = Variables(fname)
         self.seed = SeedSequence()
         self.rand_gen = Generator(PCG64(self.seed))
-        self.vector_initial = self.rand_gen.uniform(-1,1,3)
+        self.vector_initial = Normalise(self.rand_gen.uniform(-1,1,3))
         self.pos_initial = np.array([0, 0, 0])
         self.time = np.full(self.vars.sample_total, self.vars.base_time)
         self.time = np.append([0], self.time)
