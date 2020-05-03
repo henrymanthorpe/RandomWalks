@@ -28,10 +28,10 @@ name =
 # Bacteria shape (Sphere or Ellipsoid)
 shape = Sphere
 
-# Spherical radius (if Sphere)
+# Spherical radius (if Sphere)  (metres)
 radius_sphere = 0.5e-6
 
-# Semi-Major and Semi-Minor axis radii (if Ellipsoid)
+# Semi-Major and Semi-Minor axis radii (if Ellipsoid) (metres)
 radius_major =
 radius_minor =
 
@@ -46,7 +46,7 @@ start_pos = 0,0,0
 # System Temperature (K)
 temp = 297.0
 
-# Absolute Viscosity of the medium (kg/(m*s))
+# Absolute Viscosity of the medium (Pa*s)
 # 'water' provides semi-empirical value for viscosity
 # at one atmosphere for 273 <= T <= 373
 viscosity = 8.9e-4
@@ -74,7 +74,7 @@ diffusive = yes
 run = yes
 
 # Run Speed (N)
-run_force = 1.26e-13
+run_force = 1.25e-13
 
 # Varying Run Duration
 run_var = yes

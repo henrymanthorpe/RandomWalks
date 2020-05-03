@@ -86,7 +86,7 @@ def main(argv):
             parser.parse_args(['-h'])
             sys.exit()
     if args.importing:
-        if not args.graph and not args.visualisation:
+        if not args.graph and not args.vis:
             print("Error: Importing data for no reason (graph/vis)")
             parser.parse_args(['-h'])
             sys.exit()

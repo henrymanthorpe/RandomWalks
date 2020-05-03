@@ -484,6 +484,7 @@ class Graphing:
                     time_array = np.append(time_array, time_list[i])
 
                 time_mean = np.mean(time_array)
+                self.LDValues[key].avg_tumble_duration = time_mean
                 time_std = np.std(time_array)
                 time_med = np.median(time_array)
                 results, bin_edges = np.histogram(time_array,
@@ -521,9 +522,8 @@ class Graphing:
                 for key in self.bacteria.bacterium.keys():
                     if self.bacteria.config[key].run_behaviour:
                         self.LDValues[key].LDCalc()
-                        write_string = "%s \t Name: %s \tLD Value: %e \t Error: %e \n"\
+                        write_string = "%s \t Name: %s \tLD Value: %e\n"\
                                        %    (key, self.bacteria.config[key].name,
-                                            self.LDValues[key].LD_Diff,
-                                            self.LDValues[key].LD_err)
+                                            self.LDValues[key].LD_Diff)
                         LD_f.write(write_string)
 

@@ -10,17 +10,36 @@ import os
 
 class LDValues:
     def __init__(self, variables):
+        if not variables.run_behaviour:
+            self.LD = False
+            return
+        else:
+            self.LD = True
         self.run_speed = variables.run_force/variables.frictional_drag_linear
-        self.avg_tumble = 0.0
-        self.tumble_err = 0.0
+        self.diffusive = variables.diffusive
+        self.diff_rot = variables.diffusion_constant_rotational
+        self.simstep = variables.base_time
+        if self.diffusive:
+            alpha = np.sqrt(4*self.diff_rot*self.simstep)
+            self.tau_B = self.simstep/(1-np.cos(alpha))
+        if variables.archaea_mode:
+            self.avg_tumble = np.pi
+        else:
+            self.avg_tumble = 0.0 # Values for these are set during analysis sequence
         self.avg_run_duration = 0.0
-        self.run_dur_err = 0.0
+        self.avg_tumble_duration = 0.0
+        self.tau_A = 0.0
     def LDCalc(self):
-        numer = self.run_speed**2 * self.avg_tumble
-        denom = 3*(1-np.cos(self.avg_tumble))
-        self.tumble_cos_err = 3*np.sin(self.avg_tumble)*self.tumble_err
-        self.LD_Diff = numer/denom
-        self.LD_err = np.sqrt((self.tumble_cos_err/np.cos(self.avg_tumble))**2+(self.run_dur_err/self.avg_run_duration)**2)*self.LD_Diff
+        if not self.LD:
+            self.LD_Diff = -1.0
+            return
+        self.tau_A = self.avg_run_duration**2/((self.avg_run_duration+self.avg_tumble_duration)
+                                               *(1-np.cos(self.avg_tumble)))
+        if self.diffusive:
+            self.Tau = (self.tau_A**-1 + self.tau_B**-1)**-1
+        else:
+            self.Tau = self.tau_A
+        self.LD_Diff = (1/3)*self.run_speed**2*self.Tau
 
 def LoadValues(fname, request):
     values = np.loadtxt(fname, delimiter='\t')
